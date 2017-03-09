@@ -27,6 +27,7 @@ import java.util.logging.Logger;
 
 import net.sf.mzmine.datamodel.DataPoint;
 import net.sf.mzmine.datamodel.Feature;
+import net.sf.mzmine.datamodel.IsotopePattern;
 import net.sf.mzmine.datamodel.MZmineProject;
 import net.sf.mzmine.datamodel.PeakIdentity;
 import net.sf.mzmine.datamodel.PeakList;
@@ -253,7 +254,14 @@ public class ADAP3AlignerTask extends AbstractTask {
         
         // Read Spectrum information        
         NavigableMap <Double, Double> spectrum = new TreeMap <> ();
-        for (DataPoint dataPoint : row.getBestIsotopePattern().getDataPoints())
+        
+        IsotopePattern pattern = row.getBestIsotopePattern();
+        
+        if (pattern == null)
+            throw new IllegalArgumentException("ADAP Alignment requires mass "
+                    + "spectra (or isotopic patterns) of peaks. No spectra found.");
+        
+        for (DataPoint dataPoint : pattern.getDataPoints())
             spectrum.put(dataPoint.getMZ(), dataPoint.getIntensity());
         
         // Read Chromatogram
