@@ -184,7 +184,7 @@ public class ADAP3DecompositionV1_5SetupDialog extends ParameterSetupDialog
         pnlTabs.setLayout(new BoxLayout(pnlTabs, BoxLayout.Y_AXIS));
         
         ADAP3DecompositionV1_5Task.getInfoAndRawData(
-                peakLists[0], PEAK_INFO, CHROMATOGRAMS);
+                peakLists[0], 0.3, 0.2, PEAK_INFO, CHROMATOGRAMS);
         
         retTimeMZPlot.setMinimumSize(MIN_DIMENSIONS);
         
@@ -249,7 +249,7 @@ public class ADAP3DecompositionV1_5SetupDialog extends ParameterSetupDialog
                     new HashMap <> ();
 
             ADAP3DecompositionV1_5Task
-                    .getInfoAndRawData(peakList, peakInfo, chromatograms);
+                    .getInfoAndRawData(peakList, 0.3, 0.2, peakInfo, chromatograms);
 
             // ---------------------------------
             // Calculate retention time clusters

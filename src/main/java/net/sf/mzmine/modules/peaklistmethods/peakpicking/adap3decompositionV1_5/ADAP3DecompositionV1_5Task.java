@@ -17,6 +17,7 @@
  */
 package net.sf.mzmine.modules.peaklistmethods.peakpicking.adap3decompositionV1_5;
 
+import dulab.adap.common.algorithms.FeatureTools;
 import dulab.adap.datamodel.Component;
 import dulab.adap.datamodel.PeakInfo;
 import dulab.adap.workflow.TwoStepDecomposition;
@@ -195,7 +196,7 @@ public class ADAP3DecompositionV1_5Task extends AbstractTask {
         List <PeakInfo> peakInfo = new ArrayList <> ();
         Map <PeakInfo, NavigableMap <Double, Double>> chromatograms = 
                 new HashMap <> ();
-        getInfoAndRawData(peakList, peakInfo, chromatograms);
+        getInfoAndRawData(peakList, 0.3, 0.2, peakInfo, chromatograms);
 
         if (peakInfo.isEmpty())
             throw new IllegalArgumentException(
@@ -343,6 +344,8 @@ public class ADAP3DecompositionV1_5Task extends AbstractTask {
 //    }
     
     public static void getInfoAndRawData(final PeakList peakList,
+            final double edgeToHeightThreshold,
+            final double deltaToHeightThreshold,
             List <PeakInfo> peakInfo, 
             Map <PeakInfo, NavigableMap <Double, Double>> chromatograms)
     {
@@ -351,12 +354,25 @@ public class ADAP3DecompositionV1_5Task extends AbstractTask {
         peakInfo.clear();
         chromatograms.clear();
         
-        for (PeakListRow row : peakList.getRows()) {
-                
+        for (PeakListRow row : peakList.getRows()) 
+        {
             Feature peak = row.getBestPeak();
-            PeakInformation information = row.getPeakInformation();
+//            PeakInformation information = row.getPeakInformation();
             int[] scanNumbers = peak.getScanNumbers();
-
+            
+            // Build chromatogram
+            NavigableMap <Double, Double> chromatogram = new TreeMap <> ();
+            for (int scanNumber : scanNumbers) {
+                DataPoint dataPoint = peak.getDataPoint(scanNumber);
+                if (dataPoint != null)
+                    chromatogram.put(
+                            dataFile.getScan(scanNumber).getRetentionTime(),
+                            dataPoint.getIntensity());
+            }
+            
+            if (chromatogram.size() <= 1) continue;
+                        
+            // Fill in PeakInfo
             PeakInfo info = new PeakInfo();
 
             try {
@@ -381,46 +397,34 @@ public class ADAP3DecompositionV1_5Task extends AbstractTask {
                 info.retTime = peak.getRT();
                 info.mzValue = peak.getMZ();
                 info.intensity = peak.getHeight();
-                info.retTime = peak.getRT();
-                info.isShared = Boolean.parseBoolean(
-                        information.getPropertyValue("isShared"));
-                info.offset = Integer.parseInt(
-                        information.getPropertyValue("offset"));
-                info.sharpness = Double.parseDouble(
-                        information.getPropertyValue("sharpness"));
-                info.signalToNoiseRatio = Double.parseDouble(
-                        information.getPropertyValue("signalToNoiseRatio"));
-                info.leftPeakIndex = Integer.parseInt(
-                        information.getPropertyValue(
-                                "leftSharedBoundary",
-                                Integer.toString(info.leftApexIndex)));
-                info.rightPeakIndex = Integer.parseInt(
-                        information.getPropertyValue(
-                                "rightSharedBoundary", 
-                                Integer.toString(info.rightApexIndex)));
-                info.coeffOverArea = Double.parseDouble(
-                        information.getPropertyValue("coeffOverArea"));
+                
+                info.isShared = FeatureTools.isShared(
+                        new ArrayList <> (chromatogram.values()),
+                        edgeToHeightThreshold, deltaToHeightThreshold);
+                
+//                info.offset = Integer.parseInt(
+//                        information.getPropertyValue("offset"));
+
+                info.sharpness = FeatureTools.sharpnessYang(chromatogram);
+                
+//                info.signalToNoiseRatio = Double.parseDouble(
+//                        information.getPropertyValue("signalToNoiseRatio"));
+                info.leftPeakIndex = info.leftApexIndex;
+                info.rightPeakIndex = info.rightApexIndex;
+//                info.coeffOverArea = Double.parseDouble(
+//                        information.getPropertyValue("coeffOverArea"));
                 
             } catch (Exception e) {
                 LOG.info("Skipping " + row + ": " + e.getMessage());
                 continue;
             }
             
-            // Build chromatogram
-            NavigableMap <Double, Double> chromatogram = new TreeMap <> ();
-            for (int scanNumber : scanNumbers) {
-                DataPoint dataPoint = peak.getDataPoint(scanNumber);
-                if (dataPoint != null)
-                    chromatogram.put(
-                            dataFile.getScan(scanNumber).getRetentionTime(),
-                            dataPoint.getIntensity());
-            }
-            
-            if (chromatogram.size() <= 1) continue;
-            
             chromatograms.put(info, chromatogram);
             peakInfo.add(info);
         }
+        
+        FeatureTools.correctPeakBoundaries(peakInfo, chromatograms, 
+                edgeToHeightThreshold, deltaToHeightThreshold);
     }
     
     /**

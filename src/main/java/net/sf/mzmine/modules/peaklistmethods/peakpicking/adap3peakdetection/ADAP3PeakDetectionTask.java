@@ -17,6 +17,8 @@
  */
 package net.sf.mzmine.modules.peaklistmethods.peakpicking.adap3peakdetection;
 
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -231,20 +233,20 @@ public class ADAP3PeakDetectionTask extends AbstractTask {
         double[] mzValues = ADAPInterface.getMZVector(peakList);
         
         
-//        // Save to a file -----------------------------------------------------
-//        try {
-//            PrintWriter writer = new PrintWriter("intensities.txt");
-//            for (double intensity : intensities)
-//                writer.println(Double.toString(intensity));
-//            writer.close();
-//            
-//            writer = new PrintWriter("mzvalues.txt");
-//            for (double mz : mzValues)
-//                writer.println(Double.toString(mz));
-//            writer.close();
-//            
-//        } catch (FileNotFoundException e) {}
-//        // --------------------------------------------------------------------
+        // Save to a file -----------------------------------------------------
+        try {
+            PrintWriter writer = new PrintWriter("intensities.txt");
+            for (double intensity : intensities)
+                writer.println(Double.toString(intensity));
+            writer.close();
+            
+            writer = new PrintWriter("mzvalues.txt");
+            for (double mz : mzValues)
+                writer.println(Double.toString(mz));
+            writer.close();
+            
+        } catch (FileNotFoundException e) {}
+        // --------------------------------------------------------------------
         
         
         if (chromatogramCount == 0)
