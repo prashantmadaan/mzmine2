@@ -19,6 +19,7 @@ package net.sf.mzmine.modules.peaklistmethods.peakpicking.adap3decompositionV1_5
 
 import com.google.common.collect.Range;
 import com.google.common.collect.Sets;
+import dulab.adap.datamodel.Peak;
 import dulab.adap.datamodel.PeakInfo;
 import dulab.adap.workflow.TwoStepDecomposition;
 import java.awt.BorderLayout;
@@ -32,10 +33,8 @@ import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Random;
 import java.util.Set;
@@ -74,18 +73,15 @@ public class ADAP3DecompositionV1_5SetupDialog extends ParameterSetupDialog
     private static final byte SECOND_PHASE_CHANGE = 2;
     
     class ComboClustersItem {
-        public final List <PeakInfo> cluster;
+        public final List <Peak> cluster;
         public final double aveRetTime;
-        public final Map <PeakInfo, NavigableMap <Double, Double>> chromatograms;
         
-        public ComboClustersItem(List <PeakInfo> cluster,
-                Map <PeakInfo, NavigableMap <Double, Double>> chromatograms) 
+        public ComboClustersItem(List <Peak> cluster)
         {
             this.cluster = cluster;
-            this.chromatograms = chromatograms;
             
             double sumRetTime = 0.0;
-            for (PeakInfo info : cluster) sumRetTime += info.retTime;
+            for (Peak peak : cluster) sumRetTime += peak.getRetTime();
             aveRetTime = sumRetTime / cluster.size();
         }
         
@@ -106,13 +102,13 @@ public class ADAP3DecompositionV1_5SetupDialog extends ParameterSetupDialog
     private SimpleScatterPlot retTimeMZPlot;
     private EICPlot retTimeIntensityPlot;
     
-    public static final List <PeakInfo> PEAK_INFO = new ArrayList <> ();
-    public static final Map <PeakInfo, NavigableMap <Double, Double>> 
-            CHROMATOGRAMS = new HashMap <> ();
+//    public static final List <PeakInfo> PEAK_INFO = new ArrayList <> ();
+//    public static final Map <PeakInfo, NavigableMap <Double, Double>> 
+//            CHROMATOGRAMS = new HashMap <> ();
     
     private Object[] currentValues;
     
-    private List <List <PeakInfo>> retTimeClusters = null;
+    private List <List <Peak>> retTimeClusters = null;
     
     public ADAP3DecompositionV1_5SetupDialog(
             Window parent,
@@ -183,8 +179,8 @@ public class ADAP3DecompositionV1_5SetupDialog extends ParameterSetupDialog
         pnlTabs = new JPanel();
         pnlTabs.setLayout(new BoxLayout(pnlTabs, BoxLayout.Y_AXIS));
         
-        ADAP3DecompositionV1_5Task.getInfoAndRawData(
-                peakLists[0], 0.3, 0.2, PEAK_INFO, CHROMATOGRAMS);
+//        ADAP3DecompositionV1_5Task.getInfoAndRawData(
+//                peakLists[0], 0.3, 0.2, PEAK_INFO, CHROMATOGRAMS);
         
         retTimeMZPlot.setMinimumSize(MIN_DIMENSIONS);
         
@@ -244,12 +240,12 @@ public class ADAP3DecompositionV1_5SetupDialog extends ParameterSetupDialog
 
             final PeakList peakList = (PeakList) comboPeakList.getSelectedItem();
 
-            final List <PeakInfo> peakInfo = new ArrayList <> ();
-            final Map <PeakInfo, NavigableMap <Double, Double>> chromatograms =
-                    new HashMap <> ();
+//            final List <PeakInfo> peakInfo = new ArrayList <> ();
+//            final Map <PeakInfo, NavigableMap <Double, Double>> chromatograms =
+//                    new HashMap <> ();
 
-            ADAP3DecompositionV1_5Task
-                    .getInfoAndRawData(peakList, 0.3, 0.2, peakInfo, chromatograms);
+            final List <Peak> peaks = ADAP3DecompositionV1_5Task
+                    .getPeaks(peakList, 0.3, 0.2);
 
             // ---------------------------------
             // Calculate retention time clusters
@@ -259,8 +255,7 @@ public class ADAP3DecompositionV1_5SetupDialog extends ParameterSetupDialog
             List <Double> mzValues = new ArrayList <> ();
             List <Double> colorValues = new ArrayList <> ();
 
-            retTimeCluster(peakInfo, chromatograms, 
-                    retTimeValues, mzValues, colorValues);
+            retTimeCluster(peaks, retTimeValues, mzValues, colorValues);
 
             final int size = retTimeValues.size();
 
@@ -283,8 +278,7 @@ public class ADAP3DecompositionV1_5SetupDialog extends ParameterSetupDialog
                 final List <List <String>> texts = new ArrayList <> ();
                 final List <Double> colors = new ArrayList <> ();
 
-                shapeCluster(item.cluster, chromatograms, 
-                        shapeClusters, texts, colors);
+                shapeCluster(item.cluster, shapeClusters, texts, colors);
 
                 retTimeIntensityPlot.updateData(shapeClusters, colors, texts, null);
             }
@@ -306,8 +300,7 @@ public class ADAP3DecompositionV1_5SetupDialog extends ParameterSetupDialog
                 final List <List <String>> texts = new ArrayList <> ();
                 final List <Double> colors = new ArrayList <> ();
 
-                shapeCluster(item.cluster, item.chromatograms, 
-                        shapeClusters, texts, colors);
+                shapeCluster(item.cluster, shapeClusters, texts, colors);
 
                 retTimeIntensityPlot.updateData(shapeClusters, colors, texts, null);
             }
@@ -387,8 +380,7 @@ public class ADAP3DecompositionV1_5SetupDialog extends ParameterSetupDialog
      * @param colorValues output of colors
      */
     
-    private void retTimeCluster(List <PeakInfo> peakInfo,
-            Map <PeakInfo, NavigableMap <Double, Double>> chromatograms,
+    private void retTimeCluster(List <Peak> peaks,
             List <Double> retTimeValues, 
             List <Double> mzValues, 
             List <Double> colorValues)
@@ -404,7 +396,7 @@ public class ADAP3DecompositionV1_5SetupDialog extends ParameterSetupDialog
             return;
         
         retTimeClusters = TwoStepDecomposition.getRetTimeClusters(
-                peakInfo, minDistance, minSize, minIntensity);
+                peaks, minDistance, minSize, minIntensity);
         
         int colorIndex = 0;
         final int numColors = 10;
@@ -418,17 +410,17 @@ public class ADAP3DecompositionV1_5SetupDialog extends ParameterSetupDialog
         for (ActionListener l : comboListeners) 
             comboClusters.removeActionListener(l);
         
-        for (List <PeakInfo> cluster : retTimeClusters)
+        for (List <Peak> cluster : retTimeClusters)
         {
-            for (PeakInfo info : cluster) {
-                retTimeValues.add(info.retTime);
-                mzValues.add(info.mzValue);
+            for (Peak peak : cluster) {
+                retTimeValues.add(peak.getRetTime());
+                mzValues.add(peak.getMZ());
                 colorValues.add(colors[colorIndex % numColors]);
             }
             
             ++colorIndex;
             
-            ComboClustersItem newItem = new ComboClustersItem(cluster, chromatograms);
+            ComboClustersItem newItem = new ComboClustersItem(cluster);
             
             int i;
             
@@ -448,8 +440,6 @@ public class ADAP3DecompositionV1_5SetupDialog extends ParameterSetupDialog
         // Enable action listeners
         for (ActionListener l : comboListeners) 
             comboClusters.addActionListener(l);
-        
-//        comboClusters.setSelectedIndex(0);
     }
     
     /**
@@ -461,8 +451,7 @@ public class ADAP3DecompositionV1_5SetupDialog extends ParameterSetupDialog
      * @param outColors output of colors
      */
     
-    private void shapeCluster(List <PeakInfo> peakInfo,
-            Map <PeakInfo, NavigableMap <Double, Double>> chromatograms,
+    private void shapeCluster(List <Peak> peaks,
             List <List <NavigableMap <Double, Double>>> outClusters,
             List <List <String>> outText,
             List <Double> outColors)
@@ -480,15 +469,15 @@ public class ADAP3DecompositionV1_5SetupDialog extends ParameterSetupDialog
                 || minModelPeakSharpness == null 
                 || deprecatedMZValues == null) return;
         
-        List <PeakInfo> modelPeakCandidates = 
-                TwoStepDecomposition.filterPeakInfo(peakInfo,
+        List <Peak> modelPeakCandidates = 
+                TwoStepDecomposition.filterPeaks(peaks,
                         minModelPeakStN, minModelPeakSharpness,
                         deprecatedMZValues);
         
         if (modelPeakCandidates.isEmpty()) return;
         
-        List <List <PeakInfo>> clusters = TwoStepDecomposition.getShapeClusters(
-                    modelPeakCandidates, chromatograms, shapeSimThreshold);
+        List <List <Peak>> clusters = TwoStepDecomposition.getShapeClusters(
+                    modelPeakCandidates, shapeSimThreshold);
         
         outClusters.clear();
         outText.clear();
@@ -503,16 +492,16 @@ public class ADAP3DecompositionV1_5SetupDialog extends ParameterSetupDialog
         
         for (int i = 0; i < numColors; ++i) colors[i] = rand.nextDouble();
         
-        for (List <PeakInfo> cluster : clusters) 
+        for (List <Peak> cluster : clusters) 
         {
             List <NavigableMap <Double, Double>> c = 
                     new ArrayList <> (cluster.size());
             
             List <String> texts = new ArrayList <> (cluster.size());
             
-            for (PeakInfo info : cluster) {
-                c.add(chromatograms.get(info));
-                texts.add(info.toString());
+            for (Peak peak : cluster) {
+                c.add(peak.getChromatogram());
+                texts.add(peak.getInfo().toString());
             }
             outClusters.add(c);
             outText.add(texts);
