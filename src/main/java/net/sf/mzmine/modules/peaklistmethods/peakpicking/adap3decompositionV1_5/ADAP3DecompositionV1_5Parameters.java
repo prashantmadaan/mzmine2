@@ -44,6 +44,10 @@ public class ADAP3DecompositionV1_5Parameters extends SimpleParameterSet {
     public static final PeakListsParameter PEAK_LISTS = 
             new PeakListsParameter();
     
+    // ------------------------------------------------------------------------
+    // ----- First-phase parameters -------------------------------------------
+    // ------------------------------------------------------------------------
+    
     public static final DoubleParameter MIN_CLUSTER_DISTANCE =
             new DoubleParameter("Min cluster distance (# of scans)",
                     "Minimum distance between any two clusters",
@@ -63,10 +67,27 @@ public class ADAP3DecompositionV1_5Parameters extends SimpleParameterSet {
                     NumberFormat.getNumberInstance(), 500.0
             );
     
-    public static final DoubleParameter MIN_MODEL_STN =
-            new DoubleParameter("Min signal-to-noise ratio",
-                    "Minimum Signal-to-Noise ratio that the model peak can have",
-                    NumberFormat.getNumberInstance(), 100.0);
+    // ------------------------------------------------------------------------
+    // ----- End of First-phase parameters ------------------------------------
+    // ------------------------------------------------------------------------
+    
+    // ------------------------------------------------------------------------
+    // ----- Second-phase parameters ------------------------------------------
+    // ------------------------------------------------------------------------
+    
+    public static final DoubleParameter EDGE_TO_HEIGHT_RATIO =
+            new DoubleParameter("Min edge-to-height ratio", 
+                    "A peak is considered shared if its edge-to-height ratio is below this parameter",
+                    NumberFormat.getInstance(), 0.3, 0.0, 1.0);
+    
+    public static final DoubleParameter DELTA_TO_HEIGHT_RATIO =
+            new DoubleParameter("Min delta-to-height ratio",
+                    "A peak is considered shared if its delta (difference between the edges)-to-height ratio is below this parameter",
+                    NumberFormat.getInstance(), 0.2, 0.0, 1.0);
+    
+    public static final BooleanParameter USE_ISSHARED =
+            new BooleanParameter("Find shared peaks",
+                    "If selected, peaks are marked as Shared if they are composed of two or more peaks", false);
     
     public static final DoubleParameter MIN_MODEL_SHARPNESS =
             new DoubleParameter("Min sharpness",
@@ -92,6 +113,10 @@ public class ADAP3DecompositionV1_5Parameters extends SimpleParameterSet {
                     "M/z-values to exclude while selecting model peak", 
                     false, null);
     
+    // ------------------------------------------------------------------------
+    // ----- End of Second-phase parameters -----------------------------------
+    // ------------------------------------------------------------------------
+    
     public static final StringParameter SUFFIX = new StringParameter("Suffix",
 	    "This string is added to peak list name as suffix", "ADAP-GC 3 Peak Decomposition");
     
@@ -101,7 +126,8 @@ public class ADAP3DecompositionV1_5Parameters extends SimpleParameterSet {
     
     public ADAP3DecompositionV1_5Parameters() {
 	super(new Parameter[] {PEAK_LISTS, MIN_CLUSTER_DISTANCE, 
-            MIN_CLUSTER_SIZE, MIN_CLUSTER_INTENSITY, MIN_MODEL_STN, 
+            MIN_CLUSTER_SIZE, MIN_CLUSTER_INTENSITY, 
+            USE_ISSHARED, EDGE_TO_HEIGHT_RATIO, DELTA_TO_HEIGHT_RATIO,
             MIN_MODEL_SHARPNESS, SHAPE_SIM_THRESHOLD, MODEL_PEAK_CHOICE, 
             MZ_VALUES, SUFFIX, AUTO_REMOVE});
     }

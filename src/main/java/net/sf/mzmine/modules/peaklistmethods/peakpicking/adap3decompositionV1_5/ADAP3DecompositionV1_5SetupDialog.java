@@ -244,8 +244,12 @@ public class ADAP3DecompositionV1_5SetupDialog extends ParameterSetupDialog
 //            final Map <PeakInfo, NavigableMap <Double, Double>> chromatograms =
 //                    new HashMap <> ();
 
-            final List <Peak> peaks = ADAP3DecompositionV1_5Task
-                    .getPeaks(peakList, 0.3, 0.2);
+            final List <Peak> peaks = ADAP3DecompositionV1_5Task.getPeaks(
+                    peakList, 
+                    parameterSet.getParameter(ADAP3DecompositionV1_5Parameters
+                            .EDGE_TO_HEIGHT_RATIO).getValue(),
+                    parameterSet.getParameter(ADAP3DecompositionV1_5Parameters
+                        .DELTA_TO_HEIGHT_RATIO).getValue());
 
             // ---------------------------------
             // Calculate retention time clusters
@@ -323,53 +327,6 @@ public class ADAP3DecompositionV1_5SetupDialog extends ParameterSetupDialog
                 comboClusters.setSelectedIndex(comboClusters.getSelectedIndex());
                 break;
         }
-        
-//        comboPeakList.setSelectedIndex(comboPeakList.getSelectedIndex());
-//        // -------------------------
-//        // Retrieve current PeakList
-//        // -------------------------
-//
-//        final PeakList peakList = (PeakList) comboPeakList.getSelectedItem();
-//
-//        final List <PeakInfo> peakInfo = new ArrayList <> ();
-//        final Map <PeakInfo, NavigableMap <Double, Double>> chromatograms =
-//                new HashMap <> ();
-//
-//        ADAP3DecompositionV1_5Task
-//                .getInfoAndRawData(peakList, peakInfo, chromatograms);
-//
-//        // ---------------------------------
-//        // Calculate retention time clusters
-//        // ---------------------------------
-//
-//        List <Double> retTimeValues = new ArrayList <> ();
-//        List <Double> mzValues = new ArrayList <> ();
-//        List <Double> colorValues = new ArrayList <> ();
-//
-//        retTimeCluster(peakInfo, chromatograms, 
-//                retTimeValues, mzValues, colorValues);
-//
-//        final int size = retTimeValues.size();
-//
-//        retTimeMZPlot.updateData(
-//                ArrayUtils.toPrimitive(retTimeValues.toArray(new Double[size])),
-//                ArrayUtils.toPrimitive(mzValues.toArray(new Double[size])),
-//                ArrayUtils.toPrimitive(colorValues.toArray(new Double[size])));
-//
-//        // ------------------------
-//        // Calculate shape clusters
-//        // ------------------------
-//
-//        final ComboClustersItem item = 
-//            (ComboClustersItem) comboClusters.getSelectedItem();
-//
-//        final List <List <NavigableMap <Double, Double>>> shapeClusters = 
-//                new ArrayList <> ();
-//        final List <Double> colors = new ArrayList <> ();
-//
-//        shapeCluster(item.cluster, chromatograms, shapeClusters, colors);
-//
-//        retTimeIntensityPlot.updateData(shapeClusters, colors, null);
     }
     
     /**
@@ -456,23 +413,28 @@ public class ADAP3DecompositionV1_5SetupDialog extends ParameterSetupDialog
             List <List <String>> outText,
             List <Double> outColors)
     {
+        Double edgeToHeightRatio = parameterSet.getParameter(
+                ADAP3DecompositionV1_5Parameters.EDGE_TO_HEIGHT_RATIO).getValue();
+        Double deltaToHeightRatio = parameterSet.getParameter(
+                ADAP3DecompositionV1_5Parameters.DELTA_TO_HEIGHT_RATIO).getValue();
+        Boolean useIsShared = parameterSet.getParameter(
+                ADAP3DecompositionV1_5Parameters.USE_ISSHARED).getValue();
         Double shapeSimThreshold = parameterSet.getParameter(
                 ADAP3DecompositionV1_5Parameters.SHAPE_SIM_THRESHOLD).getValue();
-        Double minModelPeakStN = parameterSet.getParameter(
-                ADAP3DecompositionV1_5Parameters.MIN_MODEL_STN).getValue();
         Double minModelPeakSharpness = parameterSet.getParameter(
                 ADAP3DecompositionV1_5Parameters.MIN_MODEL_SHARPNESS).getValue();
         List <Range <Double>> deprecatedMZValues = parameterSet.getParameter(
                 ADAP3DecompositionV1_5Parameters.MZ_VALUES).getValue();
         
-        if (shapeSimThreshold == null || minModelPeakStN == null 
+        if (edgeToHeightRatio == null || deltaToHeightRatio == null 
+                || useIsShared == null || shapeSimThreshold == null 
                 || minModelPeakSharpness == null 
                 || deprecatedMZValues == null) return;
         
         List <Peak> modelPeakCandidates = 
-                TwoStepDecomposition.filterPeaks(peaks,
-                        minModelPeakStN, minModelPeakSharpness,
-                        deprecatedMZValues);
+                TwoStepDecomposition.filterPeaks(peaks, useIsShared,
+                        edgeToHeightRatio, deltaToHeightRatio,
+                        minModelPeakSharpness, deprecatedMZValues);
         
         if (modelPeakCandidates.isEmpty()) return;
         
@@ -527,7 +489,7 @@ public class ADAP3DecompositionV1_5SetupDialog extends ParameterSetupDialog
                 new HashSet <> (Arrays.asList(new Integer[] {1, 2, 3}));
         
         final Set <Integer> secondPhaseIndices = 
-                new HashSet <> (Arrays.asList(new Integer[] {4, 5, 6, 8}));
+                new HashSet <> (Arrays.asList(new Integer[] {4, 5, 6, 7, 8, 10}));
         
         int size = Integer.min(currentValues.length, newValues.length);
         
