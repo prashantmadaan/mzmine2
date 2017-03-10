@@ -184,24 +184,24 @@ public class ADAPDetector implements PeakResolver {
 
                 PeakInfo curPeak = ADAPPeaks.get(i);
                 
-                SimplePeakInformation information = new SimplePeakInformation();
-                information.addProperty("index", 
-                        //Integer.toString(scans[(int) peakIndex[j] - 1])); // Substract one because r-indices start from 1
-                        Integer.toString((int) curPeak.peakIndex));
-                information.addProperty("sharpness", 
-                        Double.toString(curPeak.sharpness));
-                information.addProperty("signalToNoiseRatio", 
-                        Double.toString(curPeak.signalToNoiseRatio));
-                information.addProperty("isShared", 
-                        Boolean.toString(curPeak.isShared));
-                        //Boolean.toString(1.0 == curPeak.isShared));
-                information.addProperty("offset", 
-                        Integer.toString((int) curPeak.offset));
+//                SimplePeakInformation information = new SimplePeakInformation();
+//                information.addProperty("index", 
+//                        //Integer.toString(scans[(int) peakIndex[j] - 1])); // Substract one because r-indices start from 1
+//                        Integer.toString((int) curPeak.peakIndex));
+//                information.addProperty("sharpness", 
+//                        Double.toString(curPeak.sharpness));
+//                information.addProperty("signalToNoiseRatio", 
+//                        Double.toString(curPeak.signalToNoiseRatio));
+//                information.addProperty("isShared", 
+//                        Boolean.toString(curPeak.isShared));
+//                        //Boolean.toString(1.0 == curPeak.isShared));
+//                information.addProperty("offset", 
+//                        Integer.toString((int) curPeak.offset));
                 
 
                 
                 ResolvedPeak peak = new ResolvedPeak(chromatogram, curPeak.leftApexIndex, curPeak.rightApexIndex);
-                peak.setPeakInformation(information);
+//                peak.setPeakInformation(information);
 
                 
 

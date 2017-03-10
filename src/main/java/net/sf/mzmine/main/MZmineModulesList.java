@@ -49,7 +49,6 @@ import net.sf.mzmine.modules.peaklistmethods.identification.formulaprediction.Fo
 import net.sf.mzmine.modules.peaklistmethods.identification.formulapredictionpeaklist.FormulaPredictionPeakListModule;
 import net.sf.mzmine.modules.peaklistmethods.identification.fragmentsearch.FragmentSearchModule;
 import net.sf.mzmine.modules.peaklistmethods.identification.glycerophospholipidsearch.GPLipidSearchModule;
-import net.sf.mzmine.modules.peaklistmethods.identification.ms2search.Ms2SearchModule;
 
 import net.sf.mzmine.modules.peaklistmethods.identification.nist.NistMsSearchModule;
 import net.sf.mzmine.modules.peaklistmethods.identification.onlinedbsearch.OnlineDBSearchModule;
@@ -159,9 +158,7 @@ public class MZmineModulesList {
             SmoothingModule.class, DeconvolutionModule.class,
             ShapeModelerModule.class, PeakExtenderModule.class,
             TargetedPeakDetectionModule.class, ADAP3PeakDetectionModule.class,
-            //ADAP3DecompositionModule.class, 
             ADAP3DecompositionV1_5Module.class,
-            //ADAP3DecompositionV2Module.class,
 
             // Peak list filtering
             DuplicateFilterModule.class, RowsFilterModule.class, PeakComparisonRowFilterModule.class,
