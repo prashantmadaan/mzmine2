@@ -20,7 +20,6 @@ package net.sf.mzmine.modules.peaklistmethods.peakpicking.adap3decompositionV1_5
 import com.google.common.collect.Range;
 import com.google.common.collect.Sets;
 import dulab.adap.datamodel.Peak;
-import dulab.adap.datamodel.PeakInfo;
 import dulab.adap.workflow.TwoStepDecomposition;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -159,7 +158,7 @@ public class ADAP3DecompositionV1_5SetupDialog extends ParameterSetupDialog
             if (peakList.getNumberOfRawDataFiles() == 1)
                 comboPeakList.addItem(peakList);
         comboPeakList.addActionListener(this);
-        comboPeakList.setSelectedIndex(0);
+//        comboPeakList.setSelectedIndex(0);
        
         comboClusters.setFont(COMBO_FONT);
         comboClusters.addActionListener(this);
@@ -221,6 +220,7 @@ public class ADAP3DecompositionV1_5SetupDialog extends ParameterSetupDialog
                 mainPanel.add(pnlTabs, 3, 0, 1, 200, 10, 10, 
                         GridBagConstraints.BOTH);
                 pnlVisible.add(pnlLabelsFields, BorderLayout.CENTER);
+                comboPeakList.setSelectedIndex(0);
             }
             else {
                 mainPanel.remove(pnlTabs);
@@ -317,6 +317,8 @@ public class ADAP3DecompositionV1_5SetupDialog extends ParameterSetupDialog
     {
         super.updateParameterSetFromComponents();
 
+        if (!preview.isSelected()) return;
+        
         switch (compareParameters(parameterSet.getParameters()))
         {
             case FIRST_PHASE_CHANGE:
