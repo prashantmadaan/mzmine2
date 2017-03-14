@@ -28,7 +28,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
@@ -46,7 +45,6 @@ import net.sf.mzmine.datamodel.RawDataFile;
 import net.sf.mzmine.datamodel.impl.SimpleDataPoint;
 import net.sf.mzmine.datamodel.impl.SimpleFeature;
 import net.sf.mzmine.datamodel.impl.SimpleIsotopePattern;
-import net.sf.mzmine.datamodel.impl.SimplePeakInformation;
 import net.sf.mzmine.datamodel.impl.SimplePeakList;
 import net.sf.mzmine.datamodel.impl.SimplePeakListAppliedMethod;
 import net.sf.mzmine.datamodel.impl.SimplePeakListRow;
@@ -235,15 +233,15 @@ public class ADAP3DecompositionV1_5Task extends AbstractTask {
             
             // Construct PeakInformation
             
-            SimplePeakInformation information = new SimplePeakInformation(
-                    new HashMap <> (refPeakRow.getPeakInformation()
-                            .getAllProperties()));
-            
-            // Save ID if the peak list
-            information.addProperty("FROM_PEAKLIST_HASHCODE", 
-                    Integer.toString(peakList.hashCode()));
-            
-            row.setPeakInformation(information);
+//            SimplePeakInformation information = new SimplePeakInformation(
+//                    new HashMap <> (refPeakRow.getPeakInformation()
+//                            .getAllProperties()));
+//            
+//            // Save ID if the peak list
+//            information.addProperty("FROM_PEAKLIST_HASHCODE", 
+//                    Integer.toString(peakList.hashCode()));
+//            
+//            row.setPeakInformation(information);
             
             // Make a comment
             //row.setComment(information.getAllProperties().toString());
