@@ -31,7 +31,6 @@ import static net.sf.mzmine.modules.peaklistmethods.peakpicking.deconvolution.AD
 import static net.sf.mzmine.modules.peaklistmethods.peakpicking.deconvolution.ADAPpeakpicking.ADAPDetectorParameters.MIN_FEAT_HEIGHT;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -51,8 +50,6 @@ import com.google.common.collect.Range;
 
 import dulab.adap.datamodel.PeakInfo;
 import static dulab.adap.workflow.Deconvolution.DeconvoluteSignal;
-import net.sf.mzmine.datamodel.impl.SimplePeakInformation;
-import net.sf.mzmine.datamodel.impl.SimplePeakListRow;
 import static net.sf.mzmine.modules.peaklistmethods.peakpicking.deconvolution.ADAPpeakpicking.ADAPDetectorParameters.COEF_AREA_THRESHOLD;
 import static net.sf.mzmine.modules.peaklistmethods.peakpicking.deconvolution.ADAPpeakpicking.ADAPDetectorParameters.RT_FOR_CWT_SCALES_DURATION;
  
