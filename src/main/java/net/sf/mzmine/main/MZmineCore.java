@@ -264,9 +264,10 @@ public final class MZmineCore {
 	return taskController;
     }
 
-    @Nonnull
+    // Removed @Nonnull
+    // Function returns null when called from logger (line 94 of this file)
     public static Desktop getDesktop() {
-	return desktop;
+		return desktop;
     }
 
     @Nonnull
