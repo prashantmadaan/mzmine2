@@ -69,7 +69,7 @@ public class SimpleScatterPlot extends ChartPanel
         yAxis.setLowerMargin(0);
         
         xyDataset = new DefaultXYZDataset();
-        int length = Integer.min(xValues.length, yValues.length);
+        int length = Math.min(xValues.length, yValues.length);
         double[][] data = new double[3][length];
         System.arraycopy(xValues, 0, data[0], 0, length);
         System.arraycopy(yValues, 0, data[1], 0, length);
@@ -105,7 +105,7 @@ public class SimpleScatterPlot extends ChartPanel
     {
         xyDataset.removeSeries(SERIES_ID);
         
-        int length = Integer.min(xValues.length, yValues.length);
+        int length = Math.min(xValues.length, yValues.length);
         
         double[][] data = new double[3][length];
         System.arraycopy(xValues, 0, data[0], 0, length);
