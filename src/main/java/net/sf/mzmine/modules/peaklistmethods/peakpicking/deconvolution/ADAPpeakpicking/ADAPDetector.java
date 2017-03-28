@@ -50,8 +50,10 @@ import com.google.common.collect.Range;
 
 import dulab.adap.datamodel.PeakInfo;
 import static dulab.adap.workflow.Deconvolution.DeconvoluteSignal;
+import net.sf.mzmine.modules.MZmineProcessingStep;
 import static net.sf.mzmine.modules.peaklistmethods.peakpicking.deconvolution.ADAPpeakpicking.ADAPDetectorParameters.COEF_AREA_THRESHOLD;
 import static net.sf.mzmine.modules.peaklistmethods.peakpicking.deconvolution.ADAPpeakpicking.ADAPDetectorParameters.RT_FOR_CWT_SCALES_DURATION;
+import static net.sf.mzmine.modules.peaklistmethods.peakpicking.deconvolution.ADAPpeakpicking.ADAPDetectorParameters.SN_ESTIMATORS;
  
 
 /**
@@ -125,6 +127,11 @@ public class ADAPDetector implements PeakResolver {
         Range<Double> peakDuration = parameters.getParameter(
         PEAK_DURATION).getValue();
         
+        final MZmineProcessingStep<SNEstimatorChoice> signalNoiseEstimator 
+                        = parameters.getParameter(SN_ESTIMATORS).getValue();
+        String SNCode = signalNoiseEstimator.getModule().getSNCode();
+        
+        
         // get the average rt spacing
         double rtSum = 0.0;
         for (int i =0; i< retentionTimes.length-1; i++){
@@ -152,7 +159,8 @@ public class ADAPDetector implements PeakResolver {
                         peakDuration,
                 parameters.getParameter(COEF_AREA_THRESHOLD).getValue(),
                 numScansRTLow,
-                numScansRTHigh);
+                numScansRTHigh,
+                SNCode);
 
         final List<ResolvedPeak> resolvedPeaks;
 
