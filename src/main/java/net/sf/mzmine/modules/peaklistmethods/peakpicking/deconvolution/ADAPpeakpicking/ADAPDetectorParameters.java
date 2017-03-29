@@ -36,6 +36,8 @@ import net.sf.mzmine.parameters.parametertypes.ranges.DoubleRangeParameter;
 import net.sf.mzmine.util.ExitCode;
 
 import com.google.common.collect.Range;
+import net.sf.mzmine.modules.peaklistmethods.peakpicking.deconvolution.PeakResolver;
+import net.sf.mzmine.parameters.parametertypes.ModuleComboParameter;
 
 /**
  * Parameters used by CentWaveDetector.
@@ -77,6 +79,8 @@ public class ADAPDetectorParameters extends SimpleParameterSet {
 //	    return index;
 //	}
 //    }
+    private static final SNEstimatorChoice[] SNESTIMATORS ={ new IntensityWindowsSNEstimator(),
+                                                            new WaveletCoefficientsSNEstimator()};
 
     public static final DoubleRangeParameter PEAK_DURATION = new DoubleRangeParameter(
 	    "Peak duration range", "Range of acceptable peak lengths",
@@ -92,7 +96,8 @@ public class ADAPDetectorParameters extends SimpleParameterSet {
 //	    "Wavelet scales",
 //	    "Range wavelet widths (smallest, largest) in minutes", MZmineCore
 //		    .getConfiguration().getRTFormat(), Range.closed(0.25, 5.0));
-    
+    public static final ModuleComboParameter<SNEstimatorChoice> SN_ESTIMATORS = new ModuleComboParameter<SNEstimatorChoice>(
+	    "SN estimator", "SN description", SNESTIMATORS);
 
     public static final DoubleParameter SN_THRESHOLD = new DoubleParameter(
 	    "S/N threshold", "Signal to noise ratio threshold",
@@ -122,7 +127,7 @@ public class ADAPDetectorParameters extends SimpleParameterSet {
     public ADAPDetectorParameters() {
 
 	//super(new Parameter[] { SN_THRESHOLD,SHARP_THRESHOLD, MIN_FEAT_HEIGHT, PEAK_DURATION, });
-        super(new Parameter[] { SN_THRESHOLD, MIN_FEAT_HEIGHT, COEF_AREA_THRESHOLD, PEAK_DURATION,RT_FOR_CWT_SCALES_DURATION });
+        super(new Parameter[] { SN_THRESHOLD,SN_ESTIMATORS, MIN_FEAT_HEIGHT, COEF_AREA_THRESHOLD, PEAK_DURATION,RT_FOR_CWT_SCALES_DURATION });
     }
 
     @Override
