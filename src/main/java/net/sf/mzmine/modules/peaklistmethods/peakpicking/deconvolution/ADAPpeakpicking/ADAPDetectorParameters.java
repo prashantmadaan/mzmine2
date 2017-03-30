@@ -38,6 +38,8 @@ import net.sf.mzmine.util.ExitCode;
 import com.google.common.collect.Range;
 import net.sf.mzmine.modules.peaklistmethods.peakpicking.deconvolution.PeakResolver;
 import net.sf.mzmine.parameters.parametertypes.ModuleComboParameter;
+import net.sf.mzmine.parameters.parametertypes.ranges.RTRangeParameter;
+import net.sf.mzmine.parameters.parametertypes.tolerances.RTToleranceParameter;
 
 /**
  * Parameters used by CentWaveDetector.
@@ -87,10 +89,11 @@ public class ADAPDetectorParameters extends SimpleParameterSet {
 	    MZmineCore.getConfiguration().getRTFormat(),
 	    Range.closed(0.0, 10.0));
     
-    public static final DoubleRangeParameter RT_FOR_CWT_SCALES_DURATION = new DoubleRangeParameter(
+    public static final RTRangeParameter RT_FOR_CWT_SCALES_DURATION = new RTRangeParameter(
 	    "RT wavelet range", "Upper and lower bounds of retention times to be used for setting the wavelet scales.",
-	    MZmineCore.getConfiguration().getRTFormat(),
+	    true,
 	    Range.closed(0.01, 0.1));
+            //MZmineCore.getConfiguration().getRTFormat()
 
 //    public static final DoubleRangeParameter PEAK_SCALES = new DoubleRangeParameter(
 //	    "Wavelet scales",

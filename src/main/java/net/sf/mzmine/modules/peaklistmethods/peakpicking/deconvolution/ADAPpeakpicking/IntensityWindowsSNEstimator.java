@@ -26,7 +26,7 @@ public class IntensityWindowsSNEstimator implements SNEstimatorChoice{
     @Override
     public @Nonnull
     Class<? extends ParameterSet> getParameterSetClass() {
-        return null;
+        return IntensityWindowsSNParameters.class;
     }
     
         @Override
