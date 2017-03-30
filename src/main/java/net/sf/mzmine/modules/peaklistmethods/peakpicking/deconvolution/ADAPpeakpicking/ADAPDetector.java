@@ -39,6 +39,7 @@ import javax.annotation.Nonnull;
 import net.sf.mzmine.datamodel.DataPoint;
 import net.sf.mzmine.datamodel.Feature;
 import net.sf.mzmine.datamodel.RawDataFile;
+import net.sf.mzmine.datamodel.impl.SimplePeakInformation;
 import net.sf.mzmine.modules.peaklistmethods.peakpicking.deconvolution.PeakResolver;
 import net.sf.mzmine.modules.peaklistmethods.peakpicking.deconvolution.ResolvedPeak;
 //import net.sf.mzmine.modules.peaklistmethods.peakpicking.deconvolution.centwave.CentWaveDetectorParameters.PeakIntegrationMethod;
@@ -189,7 +190,9 @@ public class ADAPDetector implements PeakResolver {
 
                 PeakInfo curPeak = ADAPPeaks.get(i);
                 
-//                SimplePeakInformation information = new SimplePeakInformation();
+                SimplePeakInformation information = new SimplePeakInformation();
+                information.addProperty("Signal-to-Noise",
+                        Double.toString(curPeak.signalToNoiseRatio));
 //                information.addProperty("index", 
 //                        //Integer.toString(scans[(int) peakIndex[j] - 1])); // Substract one because r-indices start from 1
 //                        Integer.toString((int) curPeak.peakIndex));
@@ -206,15 +209,11 @@ public class ADAPDetector implements PeakResolver {
 
                 
                 ResolvedPeak peak = new ResolvedPeak(chromatogram, curPeak.leftApexIndex, curPeak.rightApexIndex);
-//                peak.setPeakInformation(information);
-
-                
+                peak.setPeakInformation(information);
 
 
                 resolvedPeaks.add(peak);
                 //resolvedPeaks.add(new ResolvedPeak(chromatogram,curPeak.leftApexIndex, curPeak.rightApexIndex));
-
-
             }
         }
 
