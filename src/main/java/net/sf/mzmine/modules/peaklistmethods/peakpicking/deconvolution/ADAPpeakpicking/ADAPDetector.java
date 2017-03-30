@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2015 The MZmine 2 Development Team
+ * Copyright 2006-2015 The du-lab Development Team
  *
  * This file is part of MZmine 2.
  *
@@ -16,9 +16,8 @@
  * MZmine 2; if not, write to the Free Software Foundation, Inc., 51 Franklin St,
  * Fifth Floor, Boston, MA 02110-1301 USA
  */
-
-/* Code created was by or on behalf of Syngenta and is released under the open source license in use for the
- * pre-existing code or project. Syngenta does not assert ownership or copyright any over pre-existing work.
+ /*
+ * author Owen Myers (Oweenm@gmail.com)
  */
 
 package net.sf.mzmine.modules.peaklistmethods.peakpicking.deconvolution.ADAPpeakpicking;

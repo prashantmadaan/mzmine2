@@ -1,28 +1,33 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright 2006-2015 The du-lab Development Team
+ *
+ * This file is part of MZmine 2.
+ *
+ * MZmine 2 is free software; you can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software
+ * Foundation; either version 2 of the License, or (at your option) any later
+ * version.
+ *
+ * MZmine 2 is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * MZmine 2; if not, write to the Free Software Foundation, Inc., 51 Franklin St,
+ * Fifth Floor, Boston, MA 02110-1301 USA
+ */
+ /*
+ * author Owen Myers (Oweenm@gmail.com)
  */
 package net.sf.mzmine.modules.peaklistmethods.peakpicking.deconvolution.ADAPpeakpicking;
 
-import net.sf.mzmine.parameters.impl.SimpleParameterSet;
 
 
 import java.awt.Window;
-import java.text.NumberFormat;
-
-import net.sf.mzmine.main.MZmineCore;
-import net.sf.mzmine.modules.peaklistmethods.peakpicking.deconvolution.PeakResolverSetupDialog;
 import net.sf.mzmine.parameters.Parameter;
 import net.sf.mzmine.parameters.impl.SimpleParameterSet;
-import net.sf.mzmine.parameters.parametertypes.ComboParameter;
-import net.sf.mzmine.parameters.parametertypes.DoubleParameter;
-import net.sf.mzmine.parameters.parametertypes.ranges.DoubleRangeParameter;
 import net.sf.mzmine.util.ExitCode;
 
-import com.google.common.collect.Range;
-import net.sf.mzmine.modules.peaklistmethods.peakpicking.deconvolution.PeakResolver;
-import net.sf.mzmine.parameters.parametertypes.ModuleComboParameter;
 
 
 /**
@@ -30,21 +35,8 @@ import net.sf.mzmine.parameters.parametertypes.ModuleComboParameter;
  * @author owenmyers
  */
 public class WaveletCoefficientsSNParameters extends SimpleParameterSet{
- 
-//        public static final DoubleRangeParameter PEAK_DURATION = new DoubleRangeParameter(
-//	    "Peak duration range", "Range of acceptable peak lengths",
-//	    MZmineCore.getConfiguration().getRTFormat(),
-//	    Range.closed(0.0, 10.0));
-
-//    public static final ComboParameter<PeakIntegrationMethod> INTEGRATION_METHOD = new ComboParameter<PeakIntegrationMethod>(
-//	    "Peak integration method",
-//	    "Method used to determine RT extents of detected peaks",
-//	    PeakIntegrationMethod.values(),
-//	    PeakIntegrationMethod.UseSmoothedData);
 
     public WaveletCoefficientsSNParameters() {
-
-	//super(new Parameter[] { SN_THRESHOLD,SHARP_THRESHOLD, MIN_FEAT_HEIGHT, PEAK_DURATION, });
         super(new Parameter[] { });
     }
 
