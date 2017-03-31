@@ -43,6 +43,7 @@ public class DoubleRangeComponent extends GridBagPanel {
 
         minTxtField = new JTextField();
         minTxtField.setColumns(8);
+        
 
         maxTxtField = new JTextField();
         maxTxtField.setColumns(8);

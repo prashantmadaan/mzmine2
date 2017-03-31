@@ -54,6 +54,7 @@ import net.sf.mzmine.modules.MZmineProcessingStep;
 import static net.sf.mzmine.modules.peaklistmethods.peakpicking.deconvolution.ADAPpeakpicking.ADAPDetectorParameters.COEF_AREA_THRESHOLD;
 import static net.sf.mzmine.modules.peaklistmethods.peakpicking.deconvolution.ADAPpeakpicking.ADAPDetectorParameters.RT_FOR_CWT_SCALES_DURATION;
 import static net.sf.mzmine.modules.peaklistmethods.peakpicking.deconvolution.ADAPpeakpicking.ADAPDetectorParameters.SN_ESTIMATORS;
+import static net.sf.mzmine.modules.peaklistmethods.peakpicking.deconvolution.ADAPpeakpicking.WaveletCoefficientsSNParameters.HALF_WAVELET_WINDOW;
  
 
 /**
@@ -131,6 +132,8 @@ public class ADAPDetector implements PeakResolver {
                         = parameters.getParameter(SN_ESTIMATORS).getValue();
         String SNCode = signalNoiseEstimator.getModule().getSNCode();
         
+        double  signalNoiseWindowMult = signalNoiseEstimator.getParameterSet().getParameter(HALF_WAVELET_WINDOW).getValue();
+        
         
         // get the average rt spacing
         double rtSum = 0.0;
@@ -160,7 +163,8 @@ public class ADAPDetector implements PeakResolver {
                 parameters.getParameter(COEF_AREA_THRESHOLD).getValue(),
                 numScansRTLow,
                 numScansRTHigh,
-                SNCode);
+                SNCode,
+                signalNoiseWindowMult);
 
         final List<ResolvedPeak> resolvedPeaks;
 

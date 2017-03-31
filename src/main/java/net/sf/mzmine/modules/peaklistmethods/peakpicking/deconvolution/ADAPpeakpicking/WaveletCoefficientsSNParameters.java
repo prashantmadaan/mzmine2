@@ -24,8 +24,10 @@ package net.sf.mzmine.modules.peaklistmethods.peakpicking.deconvolution.ADAPpeak
 
 
 import java.awt.Window;
+import java.text.NumberFormat;
 import net.sf.mzmine.parameters.Parameter;
 import net.sf.mzmine.parameters.impl.SimpleParameterSet;
+import net.sf.mzmine.parameters.parametertypes.DoubleParameter;
 import net.sf.mzmine.util.ExitCode;
 
 
@@ -35,9 +37,11 @@ import net.sf.mzmine.util.ExitCode;
  * @author owenmyers
  */
 public class WaveletCoefficientsSNParameters extends SimpleParameterSet{
-
+    public static final DoubleParameter HALF_WAVELET_WINDOW = new DoubleParameter(
+	    "peak width mult.\nHow far either side", "Singal to noise estimator window size determination.",
+	    NumberFormat.getNumberInstance(), 3.0, 0.0, null);
     public WaveletCoefficientsSNParameters() {
-        super(new Parameter[] { });
+        super(new Parameter[] { HALF_WAVELET_WINDOW});
     }
 
     @Override
