@@ -132,8 +132,10 @@ public class ADAPDetector implements PeakResolver {
                         = parameters.getParameter(SN_ESTIMATORS).getValue();
         String SNCode = signalNoiseEstimator.getModule().getSNCode();
         
-        double  signalNoiseWindowMult = signalNoiseEstimator.getParameterSet().getParameter(HALF_WAVELET_WINDOW).getValue();
-        
+        double  signalNoiseWindowMult =-1.0;
+        if (SNCode == "Wavelet Coefficient Estimator"){
+            signalNoiseWindowMult = signalNoiseEstimator.getParameterSet().getParameter(HALF_WAVELET_WINDOW).getValue();
+        }
         
         // get the average rt spacing
         double rtSum = 0.0;
