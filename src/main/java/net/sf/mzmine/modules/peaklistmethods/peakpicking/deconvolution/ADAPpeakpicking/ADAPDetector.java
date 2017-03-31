@@ -50,10 +50,13 @@ import com.google.common.collect.Range;
 
 import dulab.adap.datamodel.PeakInfo;
 import static dulab.adap.workflow.Deconvolution.DeconvoluteSignal;
+import java.util.HashMap;
+import java.util.Map;
 import net.sf.mzmine.modules.MZmineProcessingStep;
 import static net.sf.mzmine.modules.peaklistmethods.peakpicking.deconvolution.ADAPpeakpicking.ADAPDetectorParameters.COEF_AREA_THRESHOLD;
 import static net.sf.mzmine.modules.peaklistmethods.peakpicking.deconvolution.ADAPpeakpicking.ADAPDetectorParameters.RT_FOR_CWT_SCALES_DURATION;
 import static net.sf.mzmine.modules.peaklistmethods.peakpicking.deconvolution.ADAPpeakpicking.ADAPDetectorParameters.SN_ESTIMATORS;
+import static net.sf.mzmine.modules.peaklistmethods.peakpicking.deconvolution.ADAPpeakpicking.WaveletCoefficientsSNParameters.ABS_WAV_COEFFS;
 import static net.sf.mzmine.modules.peaklistmethods.peakpicking.deconvolution.ADAPpeakpicking.WaveletCoefficientsSNParameters.HALF_WAVELET_WINDOW;
  
 
@@ -133,8 +136,14 @@ public class ADAPDetector implements PeakResolver {
         String SNCode = signalNoiseEstimator.getModule().getSNCode();
         
         double  signalNoiseWindowMult =-1.0;
+        boolean absWavCoeffs = false;
+        Map <String,Object> informationSN = new HashMap <String,Object>();
+        informationSN.put("code","Wavelet Coefficient Estimator");
         if (SNCode == "Wavelet Coefficient Estimator"){
             signalNoiseWindowMult = signalNoiseEstimator.getParameterSet().getParameter(HALF_WAVELET_WINDOW).getValue();
+            absWavCoeffs = signalNoiseEstimator.getParameterSet().getParameter(ABS_WAV_COEFFS).getValue();
+            informationSN.put("multiplier",signalNoiseWindowMult);
+            informationSN.put("absolutewavecoeffs",absWavCoeffs);
         }
         
         // get the average rt spacing
@@ -165,8 +174,7 @@ public class ADAPDetector implements PeakResolver {
                 parameters.getParameter(COEF_AREA_THRESHOLD).getValue(),
                 numScansRTLow,
                 numScansRTHigh,
-                SNCode,
-                signalNoiseWindowMult);
+                informationSN);
 
         final List<ResolvedPeak> resolvedPeaks;
 
