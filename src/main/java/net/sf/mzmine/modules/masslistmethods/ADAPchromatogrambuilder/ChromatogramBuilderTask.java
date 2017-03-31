@@ -167,6 +167,8 @@ public class ChromatogramBuilderTask extends AbstractTask {
         // Check if the scans are properly ordered by RT
         double prevRT = Double.NEGATIVE_INFINITY;
         for (Scan s : scans) {
+            if (isCanceled()){
+                return;}
 
             if (writeChromCDF){
                 rtListForChromCDF.add(s.getRetentionTime());
