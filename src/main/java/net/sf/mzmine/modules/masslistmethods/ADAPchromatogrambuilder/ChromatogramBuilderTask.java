@@ -258,7 +258,8 @@ public class ChromatogramBuilderTask extends AbstractTask {
         totalPoints = simpleAllMzVals.length;
 
         for (ExpandedDataPoint mzPeak : simpleAllMzVals){
-
+            if (isCanceled()){
+                return;}
 
             if (mzPeak==null){
                 //System.out.println("null Peak");
@@ -355,6 +356,8 @@ public class ChromatogramBuilderTask extends AbstractTask {
         List<Chromatogram> buildingChromatograms = new ArrayList<Chromatogram>();
 
         while (RangeIterator.hasNext()) {
+            if (isCanceled()){
+                return;}
 
             Range<Double> curRangeKey = RangeIterator.next();
 
