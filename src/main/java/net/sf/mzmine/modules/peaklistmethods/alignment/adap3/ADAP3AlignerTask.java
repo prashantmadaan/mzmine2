@@ -170,7 +170,7 @@ public class ADAP3AlignerTask extends AbstractTask {
         {
             final Peak peak = component.getBestPeak();
             
-            System.out.println(peak.getMZ());
+//            System.out.println(peak.getMZ());
             
             PeakListRow refRow = findRow(peakLists, component.getSampleID(), 
                     peak.getInfo().peakID);
@@ -193,7 +193,7 @@ public class ADAP3AlignerTask extends AbstractTask {
             
             
             PeakIdentity identity = refRow.getPreferredPeakIdentity();
-            SimplePeakIdentity newIdentity;
+//            SimplePeakIdentity newIdentity;
             
             if (identity != null)
                 newRow.addPeakIdentity(identity, true);
@@ -207,6 +207,7 @@ public class ADAP3AlignerTask extends AbstractTask {
             double mass = getQuantitativeMass(component);
             
             SimplePeakInformation information = new SimplePeakInformation();
+            information.addProperty("REFERENCE FILE", refRow.getRawDataFiles()[0].getName());
             information.addProperty("QUANTITATION MASS", Double.toString(mass));
             
             List <Component> components = 
@@ -393,8 +394,11 @@ public class ADAP3AlignerTask extends AbstractTask {
         // ----------------------------------------
         
         Map <Long, Integer> counts = new HashMap <> ();
-        for (Long mz : integerMZs) 
-            counts.put(mz, counts.getOrDefault(mz, 0) + 1);
+        for (Long mz : integerMZs) {
+            Integer count = counts.get(mz);
+            if (count == null) count = 0;
+            counts.put(mz, count + 1);
+        }
         
         Long bestMZ = null;
         int maxCount = 0;
