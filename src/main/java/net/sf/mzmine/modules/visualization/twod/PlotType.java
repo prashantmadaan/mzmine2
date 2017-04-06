@@ -5,8 +5,8 @@ package net.sf.mzmine.modules.visualization.twod;
  */
 public enum PlotType {
 
-    FAST2D("Fast color map 2D"),
-    POINT2D("Slow individual points 2D");
+    FAST2D("Resampled data"),
+    POINT2D("Use raw data points");
 
     private String type;
 

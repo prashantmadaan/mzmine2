@@ -35,7 +35,7 @@ public class TwoDVisualizerParameters extends SimpleParameterSet {
 
     public static final ComboParameter <PlotType> plotType=new ComboParameter<>(
             "Type of plot",
-            "Choose the way the plot will show the data.",
+            "Resampled data -> fast. Raw data -> slow.",
             PlotType.values());
 
     public static final RawDataFilesParameter dataFiles = new RawDataFilesParameter(
