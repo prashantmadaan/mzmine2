@@ -42,6 +42,7 @@ import net.sf.mzmine.parameters.parametertypes.ranges.RTRangeParameter;
  */
 public class ADAPDetectorParameters extends SimpleParameterSet {
 
+//    private static final NumberFormat numberFormat = NumberFormat.getInstance();
 
     private static final SNEstimatorChoice[] SNESTIMATORS ={ new IntensityWindowsSNEstimator(),
                                                             new WaveletCoefficientsSNEstimator()};
@@ -52,10 +53,11 @@ public class ADAPDetectorParameters extends SimpleParameterSet {
 	    Range.closed(0.0, 10.0));
     
     public static final RTRangeParameter RT_FOR_CWT_SCALES_DURATION = new RTRangeParameter(
-	    "RT wavelet range", "Upper and lower bounds of retention times to be used for setting the wavelet scales.",
-	    true,
-	    Range.closed(0.01, 0.1));
-            //MZmineCore.getConfiguration().getRTFormat()
+	        "RT wavelet range",
+            "Upper and lower bounds of retention times to be used for setting the wavelet scales.",
+            MZmineCore.getConfiguration().getRTFormat(),
+            true,
+            Range.closed(0.001, 0.1));
 
 //    public static final DoubleRangeParameter PEAK_SCALES = new DoubleRangeParameter(
 //	    "Wavelet scales",
@@ -82,6 +84,8 @@ public class ADAPDetectorParameters extends SimpleParameterSet {
 
 	//super(new Parameter[] { SN_THRESHOLD,SHARP_THRESHOLD, MIN_FEAT_HEIGHT, PEAK_DURATION, });
         super(new Parameter[] { SN_THRESHOLD,SN_ESTIMATORS, MIN_FEAT_HEIGHT, COEF_AREA_THRESHOLD, PEAK_DURATION,RT_FOR_CWT_SCALES_DURATION });
+
+//        numberFormat.setMaximumFractionDigits(6);
     }
 
     @Override
