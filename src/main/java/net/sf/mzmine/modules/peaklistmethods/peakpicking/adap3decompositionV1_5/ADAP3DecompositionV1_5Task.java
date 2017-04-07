@@ -168,7 +168,7 @@ public class ADAP3DecompositionV1_5Task extends AbstractTask {
         }
     }
     
-    PeakList decomposePeaks(PeakList peakList) 
+    private PeakList decomposePeaks(PeakList peakList)
             throws CloneNotSupportedException, IOException
     {
         RawDataFile dataFile = peakList.getRawDataFile(0);
@@ -366,9 +366,7 @@ public class ADAP3DecompositionV1_5Task extends AbstractTask {
     /**
      * Performs ADAP Peak Decomposition
      * 
-     * @param peakInfo information on peaks (index, sharpness, etc.)
-     * @param windowInfo information on TIC-windows (window range)
-     * @param rawData RawData object for building chromatograms
+     * @param peaks list of Peaks
      * @return Collection of dulab.adap.Component objects
      */
     
