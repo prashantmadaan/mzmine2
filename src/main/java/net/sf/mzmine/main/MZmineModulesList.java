@@ -107,7 +107,6 @@ import net.sf.mzmine.modules.visualization.spectra.SpectraVisualizerModule;
 import net.sf.mzmine.modules.visualization.threed.ThreeDVisualizerModule;
 import net.sf.mzmine.modules.visualization.tic.TICVisualizerModule;
 import net.sf.mzmine.modules.visualization.twod.TwoDVisualizerModule;
-import net.sf.mzmine.modules.visualization.pointtwod.PointTwoDVisualizerModule;
 
 /**
  * List of modules included in MZmine 2
@@ -185,7 +184,7 @@ public class MZmineModulesList {
 
             // Visualizers
             TICVisualizerModule.class, SpectraVisualizerModule.class,
-            TwoDVisualizerModule.class, PointTwoDVisualizerModule.class, 
+            TwoDVisualizerModule.class,
             ThreeDVisualizerModule.class,
             MsMsVisualizerModule.class, NeutralLossVisualizerModule.class,
             PeakListTableModule.class, IsotopePatternExportModule.class,

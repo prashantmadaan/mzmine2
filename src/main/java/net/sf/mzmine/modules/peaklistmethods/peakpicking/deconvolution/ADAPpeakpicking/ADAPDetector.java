@@ -138,14 +138,17 @@ public class ADAPDetector implements PeakResolver {
         double  signalNoiseWindowMult =-1.0;
         boolean absWavCoeffs = false;
         Map <String,Object> informationSN = new HashMap <String,Object>();
-        informationSN.put("code","Wavelet Coefficient Estimator");
         if (SNCode == "Wavelet Coefficient Estimator"){
+            informationSN.put("code","Wavelet Coefficient Estimator");
             signalNoiseWindowMult = signalNoiseEstimator.getParameterSet().getParameter(HALF_WAVELET_WINDOW).getValue();
             absWavCoeffs = signalNoiseEstimator.getParameterSet().getParameter(ABS_WAV_COEFFS).getValue();
             informationSN.put("multiplier",signalNoiseWindowMult);
             informationSN.put("absolutewavecoeffs",absWavCoeffs);
         }
-        
+        if (SNCode == "Intensity Window Estimator") {
+            informationSN.put("code","Intensity Window Estimator");
+        }
+
         // get the average rt spacing
         double rtSum = 0.0;
         for (int i =0; i< retentionTimes.length-1; i++){
