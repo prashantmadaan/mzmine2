@@ -94,7 +94,7 @@ public class XMLExportTask extends AbstractTask {
      */
     public String getTaskDescription() {
         return "Exporting peak list(s) " + Arrays.toString(peakLists)
-                + " to MPL file(s)";
+                + " to XML file(s)";
     }
 
     /**

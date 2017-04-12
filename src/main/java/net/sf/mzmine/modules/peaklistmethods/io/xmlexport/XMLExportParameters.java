@@ -32,9 +32,9 @@ public class XMLExportParameters extends SimpleParameterSet {
     public static final FileNameParameter filename = new FileNameParameter(
 	    "Filename",
             "Use pattern \"{}\" in the file name to substitute with peak list name. " +
-            "(i.e. \"blah{}blah.mpl\" would become \"blahSourcePeakListNameblah.mpl\"). " +
+            "(i.e. \"blah{}blah.mpl\" would become \"blahSourcePeakListNameblah.xml\"). " +
             "If the file already exists, it will be overwritten.",
-	    "mpl");
+	    "xml");
 
     public static final BooleanParameter compression = new BooleanParameter(
 	    "Compressed file", "Generates a compressed file (.zip)");
