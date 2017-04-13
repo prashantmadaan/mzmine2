@@ -49,9 +49,9 @@ public class ADAP3DecompositionV1_5Parameters extends SimpleParameterSet {
     // ------------------------------------------------------------------------
     
     public static final DoubleParameter MIN_CLUSTER_DISTANCE =
-            new DoubleParameter("Min cluster distance (# of scans)",
+            new DoubleParameter("Min cluster distance (min)",
                     "Minimum distance between any two clusters",
-                    NumberFormat.getNumberInstance(), 8.5
+                    NumberFormat.getNumberInstance(), 0.01
             );
     
     public static final IntegerParameter MIN_CLUSTER_SIZE =

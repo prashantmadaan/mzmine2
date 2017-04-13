@@ -64,7 +64,7 @@ public class ADAPDetectorParameters extends SimpleParameterSet {
 //	    "Range wavelet widths (smallest, largest) in minutes", MZmineCore
 //		    .getConfiguration().getRTFormat(), Range.closed(0.25, 5.0));
     public static final ModuleComboParameter<SNEstimatorChoice> SN_ESTIMATORS = new ModuleComboParameter<SNEstimatorChoice>(
-	    "SN estimator", "SN description", SNESTIMATORS);
+	    "S/N estimator", "SN description", SNESTIMATORS);
 
     public static final DoubleParameter SN_THRESHOLD = new DoubleParameter(
 	    "S/N threshold", "Signal to noise ratio threshold",
