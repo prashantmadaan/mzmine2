@@ -371,7 +371,7 @@ public class ADAP3PeakDetectionTask extends AbstractTask {
                 continue;
             }
             
-            int length = java.lang.Integer.min(
+            int length = java.lang.Math.min(
                     leftApexIndex.length, rightApexIndex.length);
 
             // --------------------------

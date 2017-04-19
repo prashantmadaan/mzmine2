@@ -33,9 +33,9 @@ import net.sf.mzmine.util.ExitCode;
  */
 public class ADAP3DecompositionV1_5Module implements MZmineProcessingModule {
     
-    private static final String MODULE_NAME = "ADAP-GC Peak Decomposition";
+    private static final String MODULE_NAME = "Spectral deconvolution";
     private static final String MODULE_DESCRIPTION = "This method "
-            + "decomposes shared peaks and constructs pure fragmentation spectrum for each analyte";
+            + "combines peaks into analytes and constructs fragmentation spectrum for each analyte";
 
     @Override
     public @Nonnull String getName() {

@@ -252,7 +252,7 @@ public class MSPExportTask2 extends AbstractTask
             if (ip == null) continue;
 
             try {
-                writer.write("Name: " + row + NEW_LINE);
+                writer.write("Name: " + (index) + " " + row + NEW_LINE);
                 writer.write("DB#: " + index++ + NEW_LINE);
                 writer.write("ClusterID: " + row.getID() + NEW_LINE);
                 writer.write("FileID: " + feature.getDataFile().getName() + NEW_LINE);
