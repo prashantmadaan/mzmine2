@@ -59,7 +59,7 @@ import java.lang.*;
 public class ChromatogramBuilderTask extends AbstractTask {
 
     RangeSet<Double> rangeSet = TreeRangeSet.create();
-    // After each range is created it does not change so we can map the ranges (which will be uniqe)
+    // After each range is created it does not change so we can map the ranges (which will be unique)
     // to the chromatograms
     HashMap<Range,Chromatogram> rangeToChromMap = new HashMap<Range,Chromatogram>();
 
@@ -79,12 +79,11 @@ public class ChromatogramBuilderTask extends AbstractTask {
     private MZTolerance mzTolerance;
     private double minimumHeight;
     private int minimumScanSpan;
-    // Owen added User parameers;
+    // Owen added User parameters;
     private double IntensityThresh2;
     private double minIntensityForStartChrom;
 
     private SimplePeakList newPeakList;
-
 
     /**
      * @param dataFile
@@ -92,8 +91,6 @@ public class ChromatogramBuilderTask extends AbstractTask {
      */
     public ChromatogramBuilderTask(MZmineProject project, RawDataFile dataFile,
             ParameterSet parameters) {
-
-
 
         this.project = project;
         this.dataFile = dataFile;
@@ -187,7 +184,6 @@ public class ChromatogramBuilderTask extends AbstractTask {
             prevRT = s.getRetentionTime();
         }
 
-
         // Create new peak list
         newPeakList = new SimplePeakList(dataFile + " " + suffix, dataFile);
 
@@ -198,7 +194,6 @@ public class ChromatogramBuilderTask extends AbstractTask {
         //      update mz avg and other stuff
         // 
 
-        
         // make a list of all the data points
         List<ExpandedDataPoint> allMzValues = new ArrayList<ExpandedDataPoint>();
 
@@ -242,11 +237,8 @@ public class ChromatogramBuilderTask extends AbstractTask {
         Arrays.sort(simpleAllMzVals, new DataPointSorter(SortingProperty.Intensity,
                 SortingDirection.Descending));
 
-
         //Set<Chromatogram> buildingChromatograms;
         //buildingChromatograms = new LinkedHashSet<Chromatogram>();
-
-
 
         double maxIntensity = simpleAllMzVals[0].getIntensity();
 
@@ -255,7 +247,6 @@ public class ChromatogramBuilderTask extends AbstractTask {
         //Stopwatch stopwatch = Stopwatch.createUnstarted(); 
         // stopwatch2 = Stopwatch.createUnstarted(); 
         //Stopwatch stopwatch3 = Stopwatch.createUnstarted(); 
-
 
         totalPoints = simpleAllMzVals.length;
 
@@ -268,18 +259,16 @@ public class ChromatogramBuilderTask extends AbstractTask {
                 continue;
             }
 
-            //////////////////////////////////////////////////
-            
             Range<Double> containsPointRange = rangeSet.rangeContaining(mzPeak.getMZ());
             
             Range<Double> toleranceRange =  mzTolerance.getToleranceRange(mzPeak.getMZ());
             if (containsPointRange==null){
-                // skip it entierly if the intensity is not high enough
+                // skip it entirely if the intensity is not high enough
                 if (mzPeak.getIntensity()<minIntensityForStartChrom) {
                     continue;
                 }
-                // look +- mz tolerance to see if ther is a range near by. 
-                // If there is use the proper boundry of that range for the 
+                // look +- mz tolerance to see if there is a range near by.
+                // If there is use the proper boundary of that range for the
                 // new range to insure than NON OF THE RANGES OVERLAP.
                 Range<Double> plusRange = rangeSet.rangeContaining(toleranceRange.upperEndpoint());
                 Range<Double> minusRange = rangeSet.rangeContaining(toleranceRange.lowerEndpoint());
@@ -288,8 +277,7 @@ public class ChromatogramBuilderTask extends AbstractTask {
                 
                 double cur_max_testing_mz = mzPeak.getMZ();
                 
-                
-                // If both of the above ranges are null then we make the new range spaning the full
+                // If both of the above ranges are null then we make the new range  the full
                 // mz tolerance range. 
                 // If one or both are not null we need to properly modify the range of the new
                 // chromatogram so that none of the points are overlapping.
@@ -307,8 +295,6 @@ public class ChromatogramBuilderTask extends AbstractTask {
                 else if ((minusRange==null)&&(plusRange!=null)){
                     toBeLowerBound = toleranceRange.lowerEndpoint();
                     toBeUpperBound = plusRange.lowerEndpoint(); 
-//                    double tmp_this = plusRange.upperEndpoint();
-//                    System.out.println("tmp_this");
                 }
                 else if ((minusRange!=null)&&(plusRange!=null)){
                     toBeLowerBound = minusRange.upperEndpoint();
@@ -325,8 +311,6 @@ public class ChromatogramBuilderTask extends AbstractTask {
 
                 newChrom.setHighPointMZ(mzPeak.getMZ());
                 
-                
-
                 rangeToChromMap.put(newRange,newChrom);
                 // also need to put it in the set -> this is where the range can be efficiently found.
                 
@@ -335,7 +319,6 @@ public class ChromatogramBuilderTask extends AbstractTask {
             else{
                 // In this case we do not need to update the rangeSet
                 
-                
                 Chromatogram curChrom = rangeToChromMap.get(containsPointRange);
                 
                 curChrom.addMzPeak(mzPeak.getScanNumber(),mzPeak);
@@ -343,14 +326,10 @@ public class ChromatogramBuilderTask extends AbstractTask {
                 //update the entry in the map
                 rangeToChromMap.put(containsPointRange,curChrom);
                 
-                
             }
             
             processedPoints+=1;
         }
-           
-        //System.out.println("search chroms (ms): " +  stopwatch.elapsed(TimeUnit.MILLISECONDS));
-        //System.out.println("making new chrom (ms): " +  stopwatch2.elapsed(TimeUnit.MILLISECONDS));
 
         // finish chromatograms
         Iterator<Range<Double>> RangeIterator = rangeSet.asRanges().iterator();
@@ -367,11 +346,10 @@ public class ChromatogramBuilderTask extends AbstractTask {
 
             chromatogram.finishChromatogram();
 
-            // And remove chromatograms who dont have a certian number of continous points above the
+            // And remove chromatograms who dont have a certain number of continuous points above the
             // IntensityThresh2 level.
             double numberOfContinuousPointsAboveNoise = chromatogram.findNumberOfContinuousPointsAboveNoise(IntensityThresh2);
             if (numberOfContinuousPointsAboveNoise < minimumScanSpan) {
-                //System.out.println("skipping chromatogram because it does not meet the min point scan requirements");
                 continue;
             }
             else{
@@ -382,11 +360,9 @@ public class ChromatogramBuilderTask extends AbstractTask {
 
         Chromatogram[] chromatograms = buildingChromatograms.toArray(new Chromatogram[0]);
        
-
         // Sort the final chromatograms by m/z
         Arrays.sort(chromatograms,
                 new PeakSorter(SortingProperty.MZ, SortingDirection.Ascending));
-
 
         // Add the chromatograms to the new peak list
         for (Feature finishedPeak : chromatograms) {
@@ -395,7 +371,7 @@ public class ChromatogramBuilderTask extends AbstractTask {
             newRow.addPeak(dataFile, finishedPeak);
             newPeakList.addRow(newRow);
 
-//            finishedPeak.outputChromToFile();
+            //finishedPeak.outputChromToFile();
         }
 
         // Add new peaklist to the project

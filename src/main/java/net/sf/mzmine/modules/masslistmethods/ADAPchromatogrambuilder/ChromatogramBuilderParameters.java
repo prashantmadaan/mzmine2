@@ -20,6 +20,7 @@
  */
 
 package net.sf.mzmine.modules.masslistmethods.ADAPchromatogrambuilder;
+import net.sf.mzmine.desktop.preferences.NumOfThreadsParameter;
 
 import net.sf.mzmine.main.MZmineCore;
 import net.sf.mzmine.parameters.Parameter;
