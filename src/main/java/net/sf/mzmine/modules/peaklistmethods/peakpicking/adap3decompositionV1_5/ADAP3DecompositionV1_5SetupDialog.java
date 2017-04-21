@@ -19,6 +19,7 @@ package net.sf.mzmine.modules.peaklistmethods.peakpicking.adap3decompositionV1_5
 
 import com.google.common.collect.Range;
 import com.google.common.collect.Sets;
+import dulab.adap.common.algorithms.FeatureTools;
 import dulab.adap.datamodel.Peak;
 import dulab.adap.workflow.TwoStepDecomposition;
 import java.awt.BorderLayout;
@@ -30,6 +31,7 @@ import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -130,8 +132,6 @@ public class ADAP3DecompositionV1_5SetupDialog extends ParameterSetupDialog
         
         PeakList[] peakLists = MZmineCore.getDesktop().getSelectedPeakLists();
         
-        if (peakLists == null || peakLists.length == 0) return;
-        
         // -----------------------------
         // Panel with preview parameters
         // -----------------------------
@@ -139,7 +139,11 @@ public class ADAP3DecompositionV1_5SetupDialog extends ParameterSetupDialog
         preview = new JCheckBox("Show preview");
         preview.addActionListener(this);
         preview.setHorizontalAlignment(SwingConstants.CENTER);
-        preview.setEnabled(true);
+
+        if (peakLists == null || peakLists.length == 0)
+            preview.setEnabled(false);
+        else
+            preview.setEnabled(true);
         
         final JPanel previewPanel = new JPanel(new BorderLayout());
         previewPanel.add(new JSeparator(), BorderLayout.NORTH);
@@ -151,7 +155,6 @@ public class ADAP3DecompositionV1_5SetupDialog extends ParameterSetupDialog
             if (peakList.getNumberOfRawDataFiles() == 1)
                 comboPeakList.addItem(peakList);
         comboPeakList.addActionListener(this);
-//        comboPeakList.setSelectedIndex(0);
        
         comboClusters.setFont(COMBO_FONT);
         comboClusters.addActionListener(this);
@@ -170,9 +173,6 @@ public class ADAP3DecompositionV1_5SetupDialog extends ParameterSetupDialog
 //        pnlTabs = new JTabbedPane();
         pnlTabs = new JPanel();
         pnlTabs.setLayout(new BoxLayout(pnlTabs, BoxLayout.Y_AXIS));
-        
-//        ADAP3DecompositionV1_5Task.getInfoAndRawData(
-//                peakLists[0], 0.3, 0.2, PEAK_INFO, CHROMATOGRAMS);
         
         retTimeMZPlot.setMinimumSize(MIN_DIMENSIONS);
         
@@ -404,6 +404,8 @@ public class ADAP3DecompositionV1_5SetupDialog extends ParameterSetupDialog
             List <List <String>> outText,
             List <Double> outColors)
     {
+        NumberFormat numberFormat = NumberFormat.getNumberInstance();
+
         Double edgeToHeightRatio = parameterSet.getParameter(
                 ADAP3DecompositionV1_5Parameters.EDGE_TO_HEIGHT_RATIO).getValue();
         Double deltaToHeightRatio = parameterSet.getParameter(
@@ -454,7 +456,8 @@ public class ADAP3DecompositionV1_5SetupDialog extends ParameterSetupDialog
             
             for (Peak peak : cluster) {
                 c.add(peak.getChromatogram());
-                texts.add(peak.getInfo().toString());
+                texts.add(peak.getInfo() + "\nSharpness: " +
+                        numberFormat.format(FeatureTools.sharpnessYang(peak.getChromatogram())));
             }
             outClusters.add(c);
             outText.add(texts);
