@@ -78,6 +78,8 @@ public class ADAP3DecompositionV2SetupDialog extends ParameterSetupDialog
     /** Current values of the parameters */
     private Object[] currentParameters;
 
+    private final ComponentSelector componentSelector = new ComponentSelector();
+
     /** Creates an instance of the class and saves the current values of all parameters */
     ADAP3DecompositionV2SetupDialog(Window parent, boolean valueCheckRequired,
             @Nonnull final ParameterSet parameters)
@@ -320,23 +322,32 @@ public class ADAP3DecompositionV2SetupDialog extends ParameterSetupDialog
         if (retTimeTolerance == null || retTimeTolerance <= 0.0)
             return;
 
-        List<BetterPeak> chromatograms = new ADAP3DecompositionV2Utils().getPeaks(chromatogramList);
+        final List<BetterPeak> chromatograms = new ADAP3DecompositionV2Utils().getPeaks(chromatogramList);
+        final Set<Double> mzSet = cluster.ranges.stream()
+                .map(RetTimeClusterer.Item::getMZ)
+                .collect(Collectors.toSet());
 
-        List<BetterComponent> components = null;
-        try {
-            components = new ComponentSelector(cluster, chromatograms, retTimeTolerance).run();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        Thread thread = new Thread(() -> {
+            List<BetterComponent> components = componentSelector.execute(chromatograms, cluster, retTimeTolerance);
+            if (!components.isEmpty())
+                retTimeIntensityPlot.updateData(
+                        chromatograms.stream()
+                                .filter(c -> mzSet.contains(c.mzValue))
+                                .collect(Collectors.toList()),
+                        components);
+        });
+        thread.start();
+//        List<BetterComponent> components = null;
+//        try {
+//            components = componentSelector.execute(chromatograms, cluster, retTimeTolerance);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
 
-        Set<Double> mzSet = cluster.ranges.stream()
-                .map(RetTimeClusterer.Item::getMZ).collect(Collectors.toSet());
 
-        chromatograms = chromatograms.stream()
-                .filter(c -> mzSet.contains(c.mzValue)).collect(Collectors.toList());
 
-        if (components != null)
-            retTimeIntensityPlot.updateData(chromatograms, components);
+
+
     }
     
     private CHANGE_STATE compareParameters(Parameter[] newValues)

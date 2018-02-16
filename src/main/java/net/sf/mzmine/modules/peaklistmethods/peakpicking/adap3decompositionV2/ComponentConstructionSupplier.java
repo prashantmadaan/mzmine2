@@ -131,7 +131,7 @@ public class ComponentConstructionSupplier extends AlgorithmSupplier
         if (retTimeTolerance == null) return;
 
         List<BetterComponent> components =
-                new ComponentSelector(cluster, dataProvider.getChromatograms(true), retTimeTolerance).run();
+                new ComponentSelector().execute(dataProvider.getChromatograms(true), cluster, retTimeTolerance);
 
         plot.updateData(dataProvider.getChromatograms(false), components);
     }
