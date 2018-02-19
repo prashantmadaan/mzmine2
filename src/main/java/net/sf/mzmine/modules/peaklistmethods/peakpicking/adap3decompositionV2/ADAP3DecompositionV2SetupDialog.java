@@ -118,6 +118,8 @@ public class ADAP3DecompositionV2SetupDialog extends ParameterSetupDialog
         pnlUIElements = new JPanel(new BorderLayout());
         pnlUIElements.add(panel, BorderLayout.NORTH);
 
+
+
         // ComboBox for Peak lists
         cboPeakLists = new JComboBox<>();
         cboPeakLists.setFont(COMBO_FONT);
@@ -190,7 +192,7 @@ public class ADAP3DecompositionV2SetupDialog extends ParameterSetupDialog
                 // component will consume most of the extra available space.
                 mainPanel.add(pnlPlots, 3, 0, 1, 200, 10, 10,
                         GridBagConstraints.BOTH);
-                pnlUIElements.add(pnlComboBoxes, BorderLayout.CENTER);
+                pnlUIElements.add(pnlComboBoxes, BorderLayout.SOUTH);
 
                 refresh();
             }
@@ -328,26 +330,27 @@ public class ADAP3DecompositionV2SetupDialog extends ParameterSetupDialog
                 .collect(Collectors.toSet());
 
         Thread thread = new Thread(() -> {
+            JProgressBar progressBar = new JProgressBar();
+            progressBar.setIndeterminate(true);
+            pnlUIElements.add(progressBar, BorderLayout.CENTER);
+            updateMinimumSize();
+            pack();
+
+
             List<BetterComponent> components = componentSelector.execute(chromatograms, cluster, retTimeTolerance);
+
             if (!components.isEmpty())
                 retTimeIntensityPlot.updateData(
                         chromatograms.stream()
                                 .filter(c -> mzSet.contains(c.mzValue))
                                 .collect(Collectors.toList()),
                         components);
+
+            pnlUIElements.remove(progressBar);
+            updateMinimumSize();
+            pack();
         });
         thread.start();
-//        List<BetterComponent> components = null;
-//        try {
-//            components = componentSelector.execute(chromatograms, cluster, retTimeTolerance);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-
-
-
-
-
     }
     
     private CHANGE_STATE compareParameters(Parameter[] newValues)
