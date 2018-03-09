@@ -248,8 +248,6 @@ public class ADAP3DecompositionV2SetupDialog extends ParameterSetupDialog
         for (ChromatogramPeakPair p : ChromatogramPeakPair.fromParameterSet(parameterSet).values())
             cboPeakLists.addItem(p);
         cboPeakLists.addActionListener(this);
-        if (cboPeakLists.getItemCount() > 0)
-            cboPeakLists.setSelectedIndex(0);
 
         retTimeCluster();
     }
