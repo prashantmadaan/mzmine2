@@ -174,7 +174,10 @@ public class MSPExportTask extends AbstractTask
             
             String rowID = Integer.toString(row.getID());
             if (rowID != null) writer.write("DB#: " + rowID + newLine);
-            
+
+            String retTime = Double.toString(row.getAverageRT());
+            if (retTime != null) writer.write("RT: " + retTime + newLine);
+
             DataPoint[] dataPoints = ip.getDataPoints();
             
             if (!fractionalMZ)
