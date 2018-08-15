@@ -182,6 +182,9 @@ public class MSPExportTask extends AbstractTask
                 }
             }
 
+            String retTime = Double.toString(row.getAverageRT());
+            if (retTime != null) writer.write("RT: " + retTime + newLine);
+
             DataPoint[] dataPoints = ip.getDataPoints();
             
             if (!fractionalMZ)
