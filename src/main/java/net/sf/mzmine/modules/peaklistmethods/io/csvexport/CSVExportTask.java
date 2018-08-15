@@ -304,6 +304,9 @@ class CSVExportTask extends AbstractTask {
                     Feature peak = peakListRow.getPeak(dataFile);
                     if (peak != null) {
                         switch (dataFileElements[i]) {
+                        case PEAK_NAME:
+                            line.append(peak.toString() + fieldSeparator);
+                            break;
                         case PEAK_STATUS:
                             line.append(
                                     peak.getFeatureStatus() + fieldSeparator);

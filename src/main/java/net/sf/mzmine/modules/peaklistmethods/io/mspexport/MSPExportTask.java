@@ -26,12 +26,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
-import net.sf.mzmine.datamodel.DataPoint;
-import net.sf.mzmine.datamodel.IsotopePattern;
-import net.sf.mzmine.datamodel.PeakIdentity;
-import net.sf.mzmine.datamodel.PeakList;
-import net.sf.mzmine.datamodel.PeakListRow;
+
+import net.sf.mzmine.datamodel.*;
 import net.sf.mzmine.datamodel.impl.SimpleDataPoint;
+import net.sf.mzmine.datamodel.impl.SimplePeakInformation;
 import net.sf.mzmine.parameters.ParameterSet;
 import net.sf.mzmine.taskcontrol.AbstractTask;
 import net.sf.mzmine.taskcontrol.TaskStatus;
@@ -174,7 +172,16 @@ public class MSPExportTask extends AbstractTask
             
             String rowID = Integer.toString(row.getID());
             if (rowID != null) writer.write("DB#: " + rowID + newLine);
-            
+
+            for (Feature peak : row.getPeaks()) {
+                SimplePeakInformation peakInformation = peak.getPeakInformation();
+                if (peakInformation != null) {
+                    for (Entry<String, String> e : peakInformation.getAllProperties().entrySet())
+                        if (e.getKey() != null)
+                            writer.write(String.format("%s: %s%s", e.getKey(), e.getValue(), newLine));
+                }
+            }
+
             DataPoint[] dataPoints = ip.getDataPoints();
             
             if (!fractionalMZ)

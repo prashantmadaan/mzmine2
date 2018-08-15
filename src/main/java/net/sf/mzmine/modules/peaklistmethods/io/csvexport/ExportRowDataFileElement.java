@@ -21,6 +21,7 @@ package net.sf.mzmine.modules.peaklistmethods.io.csvexport;
 
 public enum ExportRowDataFileElement {
 
+    PEAK_NAME("Peak name", false),
     PEAK_STATUS("Peak status", false),
     PEAK_MZ("Peak m/z", false),
     PEAK_RT("Peak RT", false),
