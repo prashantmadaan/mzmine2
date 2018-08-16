@@ -37,14 +37,14 @@ public class SignificanceTask extends AbstractTask {
     private double finishedPercentage = 0.0;
 
     private final PeakListRow[] peakListRows;
-    private final Group group1;
-    private final Group group2;
+    private final Group controlGroup;
+    private final Group experimentalGroup;
 
 
-    public SignificanceTask(PeakListRow[] peakListRows, Group group1, Group group2) {
+    public SignificanceTask(PeakListRow[] peakListRows, Group controlGroup, Group experimentalGroup) {
         this.peakListRows = peakListRows;
-        this.group1 = group1;
-        this.group2 = group2;
+        this.controlGroup = controlGroup;
+        this.experimentalGroup = experimentalGroup;
     }
 
     public String getTaskDescription() {
@@ -62,12 +62,13 @@ public class SignificanceTask extends AbstractTask {
 
             setStatus(TaskStatus.PROCESSING);
             logger.info(
-                    String.format("Started calculating significance\r\nGroup 1 files: %s\r\nGroup 2 files: %s",
-                            group1.getFiles()
+                    String.format(
+                            "Started calculating significance\r\nControl group files: %s\r\nExperimental group files: %s",
+                            controlGroup.getFiles()
                                     .stream()
                                     .map(RawDataFile::getName)
                                     .collect(Collectors.joining(", ")),
-                            group2.getFiles()
+                            experimentalGroup.getFiles()
                                     .stream()
                                     .map(RawDataFile::getName)
                                     .collect(Collectors.joining(", "))));
@@ -77,11 +78,9 @@ public class SignificanceTask extends AbstractTask {
 
                 setStatus(TaskStatus.FINISHED);
                 logger.info("Calculating significance is completed");
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 errorMsg = "'Unknown Error' during significance calculation: " + e.getMessage();
-            }
-            catch (Throwable t) {
+            } catch (Throwable t) {
                 setStatus(TaskStatus.ERROR);
                 setErrorMessage(t.getMessage());
                 logger.log(Level.SEVERE, "Significance calculation error", t);
@@ -105,26 +104,28 @@ public class SignificanceTask extends AbstractTask {
 
             finishedPercentage += finishedStep;
 
-            double group1intensity = 0.0;
-            double group2intensity = 0.0;
+            double controlIntensity = 0.0;
+            double experimentalIntensity = 0.0;
 
             for (Feature peak : row.getPeaks()) {
-                if (group1.getFiles().contains(peak.getDataFile()))
-                    group1intensity += peak.getHeight();
-                if (group2.getFiles().contains(peak.getDataFile()))
-                    group2intensity += peak.getHeight();
+                if (controlGroup.getFiles().contains(peak.getDataFile()))
+                    controlIntensity += peak.getHeight();
+                if (experimentalGroup.getFiles().contains(peak.getDataFile()))
+                    experimentalIntensity += peak.getHeight();
             }
 
-            group1intensity /= group1.getFiles().size();
-            group2intensity /= group2.getFiles().size();
+            controlIntensity /= controlGroup.getFiles().size();
+            experimentalIntensity /= experimentalGroup.getFiles().size();
 
-            double significance = Double.NaN;
-            if (group1intensity > 0.0 && group2intensity > 0.0)
-                significance = 1.0 - Math.min(group1intensity / group2intensity, group2intensity / group1intensity);
-            else if (group1intensity > 0.0 || group2intensity > 0.0)
-                significance = 1.0;
+            double significance = 0.0;
+            if (controlIntensity > 0.0 && experimentalIntensity > 0.0)
+                significance = Math.log(experimentalIntensity / controlIntensity);
+            else if (experimentalIntensity > 0.0)
+                significance = Double.POSITIVE_INFINITY;
+            else if (controlIntensity > 0.0)
+                significance = Double.NEGATIVE_INFINITY;
 
-            if (Double.isNaN(significance)) continue;
+//            if (Double.isNaN(significance)) continue;
 
             PeakInformation peakInformation = row.getPeakInformation();
             if (peakInformation == null)

@@ -27,13 +27,13 @@ public class SignificanceParameters extends SimpleParameterSet {
 
     public static final PeakListsParameter peakLists = new PeakListsParameter(1, 1);
 
-    public static final StringParameter group1template = new StringParameter("Name Template for Group 1",
-            "All lists matching the template will be assigned to Group 1");
+    public static final StringParameter controlGroupName = new StringParameter("Control Group Name",
+            "All lists containing this name will be assigned to the control group");
 
-    public static final StringParameter group2template = new StringParameter("Name Template for Group 2",
-            "All lists matching the template will be assigned to Group 2");
+    public static final StringParameter experimentalGroupName = new StringParameter("Experimental Group Name",
+            "All lists containing this name will be assigned to the experimentral group");
 
     public SignificanceParameters() {
-        super(new Parameter[] {peakLists, group1template, group2template});
+        super(new Parameter[] {peakLists, experimentalGroupName, controlGroupName});
     }
 }
