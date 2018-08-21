@@ -139,13 +139,10 @@ public class SignificanceTask extends AbstractTask {
     public static Group getGroup(PeakListRow[] rows, String template) {
 
         Set<RawDataFile> groupFiles = new HashSet<>();
-        for (PeakListRow row : rows) {
+        for (PeakListRow row : rows)
             for (RawDataFile file : row.getRawDataFiles())
-                if (file.getName().contains(template)) {
+                if (file.getName().contains(template))
                     groupFiles.add(file);
-                    break;
-                }
-        }
 
         return new Group(groupFiles);
     }
