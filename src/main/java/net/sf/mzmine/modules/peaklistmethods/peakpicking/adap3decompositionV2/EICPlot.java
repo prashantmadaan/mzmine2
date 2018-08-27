@@ -219,7 +219,7 @@ public class EICPlot extends ChartPanel
 //        }
 //    }
 
-    void updateData(@Nonnull List<BetterPeak> peaks, @Nonnull List<BetterComponent> modelPeaks)
+    public void updateData(@Nonnull List<BetterPeak> peaks, @Nonnull List<BetterComponent> modelPeaks)
     {
         xyDataset.removeAllSeries();
         xyDataset.setNotify(false);
