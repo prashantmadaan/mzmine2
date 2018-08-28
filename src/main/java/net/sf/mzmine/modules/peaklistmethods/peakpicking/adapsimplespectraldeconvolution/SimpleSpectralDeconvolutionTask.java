@@ -22,6 +22,8 @@ import dulab.adap.datamodel.BetterComponent;
 import dulab.adap.datamodel.BetterPeak;
 import dulab.adap.datamodel.Chromatogram;
 import dulab.adap.workflow.decomposition.RetTimeClusterer;
+import dulab.adap.workflow.peakannotation.PeakAnnotation;
+import dulab.adap.workflow.peakannotation.rules.AdductList;
 import dulab.adap.workflow.simplespectraldeconvolution.Parameters;
 import dulab.adap.workflow.simplespectraldeconvolution.SimpleSpectralDeconvolution;
 import net.sf.mzmine.datamodel.*;
@@ -52,6 +54,7 @@ public class SimpleSpectralDeconvolutionTask extends AbstractTask {
     private final PeakList peakList;
     private final ParameterSet parameters;
     private final SimpleSpectralDeconvolution deconvolution;
+    private final PeakAnnotation annotation;
 
 
     SimpleSpectralDeconvolutionTask(final MZmineProject project, final PeakList peakList,
@@ -61,7 +64,7 @@ public class SimpleSpectralDeconvolutionTask extends AbstractTask {
         this.peakList = peakList;
         this.parameters = parameterSet;
         this.deconvolution = new SimpleSpectralDeconvolution();
-
+        this.annotation = new PeakAnnotation();
     }
 
     @Override
@@ -221,21 +224,50 @@ public class SimpleSpectralDeconvolutionTask extends AbstractTask {
         // ADAP Decomposition Parameters
         // -----------------------------
 
-        Parameters params = new Parameters();
+        Parameters deconvolutionParams = new Parameters();
 
-        params.retTimeTolerance = parameters.getParameter(
+        deconvolutionParams.retTimeTolerance = parameters.getParameter(
                 SimpleSpectralDeconvolutionParameters.RETENTION_TIME_TOLERANCE).getValue();
-        params.minNumPeaks = parameters.getParameter(
+        deconvolutionParams.minNumPeaks = parameters.getParameter(
                 SimpleSpectralDeconvolutionParameters.MIN_NUM_PEAKS).getValue();
-        params.peakSimilarityThreshold = parameters.getParameter(
+        deconvolutionParams.peakSimilarityThreshold = parameters.getParameter(
                 SimpleSpectralDeconvolutionParameters.SIMILARITY_TOLERANCE).getValue();
 
-        return deconvolution.run(peaks, params);
+        List<BetterComponent> components = deconvolution.run(peaks, deconvolutionParams);
+
+        String polarity = parameters.getParameter(
+                SimpleSpectralDeconvolutionParameters.POLARITY).getValue();
+
+        if (polarity == null || polarity.equals(SimpleSpectralDeconvolutionParameters.POLARITY_UNDEFINED))
+            return components;
+
+        AdductList adductList = null;
+        switch (polarity) {
+            case SimpleSpectralDeconvolutionParameters.POLARITY_POSITIVE:
+                adductList = AdductList.GEN_LIST_POS;
+                break;
+            case SimpleSpectralDeconvolutionParameters.POLARITY_NEGATIVE:
+                adductList = AdductList.GEN_LIST_NEG;
+                break;
+        }
+
+        if (adductList != null) {
+
+            PeakAnnotation.Parameters annotationParams =
+                    new PeakAnnotation.Parameters(0.01, 0.01, adductList);
+
+            components.forEach(c -> c.precursor = annotation
+                    .run(c.spectrum, annotationParams)
+                    .orElseThrow(() -> new IllegalStateException("Cannot find precursor.")));
+        }
+
+        return components;
     }
 
     @Nonnull
-    private Feature getFeature(@Nonnull RawDataFile file, @Nonnull BetterPeak peak) {
+    private Feature getFeature(@Nonnull RawDataFile file, @Nonnull BetterComponent peak) {
         Chromatogram chromatogram = peak.chromatogram;
+        double mzValue = peak.precursor != null ? peak.precursor : peak.mzValue;
 
         // Retrieve scan numbers
         int representativeScan = 0;
@@ -263,11 +295,11 @@ public class SimpleSpectralDeconvolutionTask extends AbstractTask {
         for (double intensity : chromatogram.ys)
             dataPoints[count++] = new SimpleDataPoint(peak.getMZ(), intensity);
 
-        return new SimpleFeature(file, peak.getMZ(), peak.getRetTime(), peak.getIntensity(),
+        return new SimpleFeature(file, mzValue, peak.getRetTime(), peak.getIntensity(),
                 area, scanNumbers, dataPoints,
                 Feature.FeatureStatus.MANUAL, representativeScan, representativeScan,
                 Range.closed(peak.getFirstRetTime(), peak.getLastRetTime()),
-                Range.closed(peak.getMZ() - 0.01, peak.getMZ() + 0.01),
+                Range.closed(mzValue - 0.01, mzValue + 0.01),
                 Range.closed(0.0, peak.getIntensity()));
     }
 

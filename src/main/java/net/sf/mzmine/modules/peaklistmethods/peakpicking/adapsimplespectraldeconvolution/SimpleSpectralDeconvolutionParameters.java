@@ -17,15 +17,10 @@
  */
 package net.sf.mzmine.modules.peaklistmethods.peakpicking.adapsimplespectraldeconvolution;
 
-import net.sf.mzmine.modules.peaklistmethods.peakpicking.adap3decompositionV2.ADAP3DecompositionV2SetupDialog;
 import net.sf.mzmine.parameters.Parameter;
 import net.sf.mzmine.parameters.impl.SimpleParameterSet;
-import net.sf.mzmine.parameters.parametertypes.BooleanParameter;
-import net.sf.mzmine.parameters.parametertypes.DoubleParameter;
-import net.sf.mzmine.parameters.parametertypes.IntegerParameter;
-import net.sf.mzmine.parameters.parametertypes.StringParameter;
+import net.sf.mzmine.parameters.parametertypes.*;
 import net.sf.mzmine.parameters.parametertypes.selectors.PeakListsParameter;
-import net.sf.mzmine.parameters.parametertypes.selectors.PeakListsSelectionType;
 import net.sf.mzmine.util.ExitCode;
 
 import java.awt.*;
@@ -35,6 +30,10 @@ import java.text.NumberFormat;
  * @author aleksandrsmirnov
  */
 public class SimpleSpectralDeconvolutionParameters extends SimpleParameterSet {
+
+    public static final String POLARITY_UNDEFINED = "Undefined";
+    public static final String POLARITY_POSITIVE = "Positive";
+    public static final String POLARITY_NEGATIVE = "Negative";
 
     public static final PeakListsParameter PEAK_LISTS =
             new PeakListsParameter("Peaks", 1, Integer.MAX_VALUE);
@@ -54,6 +53,11 @@ public class SimpleSpectralDeconvolutionParameters extends SimpleParameterSet {
             "All peaks of a component must be similar within this tolerance value.",
             NumberFormat.getNumberInstance(), 0.25);
 
+    public static final ComboParameter<String> POLARITY = new ComboParameter<String>(
+            "Polarity",
+            "Choose the polarity mode for LC/MS data or leave undefine for GC/MS data",
+            new String[] {POLARITY_UNDEFINED, POLARITY_POSITIVE, POLARITY_NEGATIVE});
+
     public static final StringParameter SUFFIX = new StringParameter("Suffix",
             "This string is added to peak list name as suffix", "Spectral Deconvolution");
 
@@ -62,8 +66,8 @@ public class SimpleSpectralDeconvolutionParameters extends SimpleParameterSet {
             "If checked, original chromomatogram and peak lists will be removed");
 
     public SimpleSpectralDeconvolutionParameters() {
-        super(new Parameter[]{PEAK_LISTS, RETENTION_TIME_TOLERANCE, MIN_NUM_PEAKS, SIMILARITY_TOLERANCE, SUFFIX,
-                AUTO_REMOVE});
+        super(new Parameter[]{PEAK_LISTS, RETENTION_TIME_TOLERANCE, MIN_NUM_PEAKS, SIMILARITY_TOLERANCE, POLARITY,
+                SUFFIX, AUTO_REMOVE});
     }
 
     @Override

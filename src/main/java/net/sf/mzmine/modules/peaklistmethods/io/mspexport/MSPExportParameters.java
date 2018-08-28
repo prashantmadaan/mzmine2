@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2016 Du-Lab Team <dulab.binf@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
@@ -26,38 +26,41 @@ import net.sf.mzmine.parameters.parametertypes.filenames.FileNameParameter;
 import net.sf.mzmine.parameters.parametertypes.selectors.PeakListsParameter;
 
 /**
- *
  * @author Du-Lab Team <dulab.binf@gmail.com>
  */
 
 
-public class MSPExportParameters extends SimpleParameterSet 
-{
+public class MSPExportParameters extends SimpleParameterSet {
     public static final String ROUND_MODE_MAX = "Maximum";
     public static final String ROUND_MODE_SUM = "Sum";
-    
+
     public static final PeakListsParameter PEAK_LISTS = new PeakListsParameter();
-    
+
     public static final FileNameParameter FILENAME = new FileNameParameter(
-	    "Filename",
-	    "Name of the output MSP file. " +
-	    "Use pattern \"{}\" in the file name to substitute with peak list name. " +
-	    "(i.e. \"blah{}blah.msp\" would become \"blahSourcePeakListNameblah.msp\"). " +
-	    "If the file already exists, it will be overwritten.",
-	    "msp");
-    
+            "Filename",
+            "Name of the output MSP file. " +
+                    "Use pattern \"{}\" in the file name to substitute with peak list name. " +
+                    "(i.e. \"blah{}blah.msp\" would become \"blahSourcePeakListNameblah.msp\"). " +
+                    "If the file already exists, it will be overwritten.",
+            "msp");
+
     public static final BooleanParameter FRACTIONAL_MZ = new BooleanParameter(
-            "Fractional m/z values", "If checked, write fractional m/z values", 
+            "Fractional m/z values", "If checked, write fractional m/z values",
             false);
-   
-    public static final ComboParameter <String> ROUND_MODE = 
-            new ComboParameter <> (
-                    "Merging Mode", 
+
+    public static final ComboParameter<String> ROUND_MODE =
+            new ComboParameter<>(
+                    "Merging Mode",
                     "Determines how to merge intensities with the same m/z values",
-                    new String[] {ROUND_MODE_MAX, ROUND_MODE_SUM},
+                    new String[]{ROUND_MODE_MAX, ROUND_MODE_SUM},
                     ROUND_MODE_MAX);
-    
+
+    public static final BooleanParameter SAVE_PRECURSOR = new BooleanParameter(
+            "Save feature's m/z as precursor",
+            "Save the specified m/z value of a feature as its precursor m/z",
+            false);
+
     public MSPExportParameters() {
-	super(new Parameter[] {PEAK_LISTS, FILENAME, FRACTIONAL_MZ, ROUND_MODE});
+        super(new Parameter[]{PEAK_LISTS, FILENAME, FRACTIONAL_MZ, ROUND_MODE, SAVE_PRECURSOR});
     }
 }
