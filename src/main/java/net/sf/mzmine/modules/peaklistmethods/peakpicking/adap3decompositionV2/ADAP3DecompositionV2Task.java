@@ -83,8 +83,8 @@ public class ADAP3DecompositionV2Task extends AbstractTask {
             LOG.info("Started ADAP Peak Decomposition on " + originalLists);
 
             // Check raw data files.
-            if (originalLists.chromatograms.getNumberOfRawDataFiles() > 1
-                    && originalLists.peaks.getNumberOfRawDataFiles() > 1)
+            if (originalLists.chromatograms.getNumberOfRawDataFiles() == 0
+                    || originalLists.peaks.getNumberOfRawDataFiles() == 0)
             {
                 setStatus(TaskStatus.ERROR);
                 setErrorMessage("Peak Decomposition can only be performed on peak lists with a single raw data file");

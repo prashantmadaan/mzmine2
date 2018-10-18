@@ -152,7 +152,7 @@ public class ADAP3DecompositionV1_5SetupDialog extends ParameterSetupDialog
         
         comboPeakList.setFont(COMBO_FONT);
         for (final PeakList peakList : peakLists)
-            if (peakList.getNumberOfRawDataFiles() == 1)
+            if (peakList.getNumberOfRawDataFiles() > 0)
                 comboPeakList.addItem(peakList);
         comboPeakList.addActionListener(this);
        

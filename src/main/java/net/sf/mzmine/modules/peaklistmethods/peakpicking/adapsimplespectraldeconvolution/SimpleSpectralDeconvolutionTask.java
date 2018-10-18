@@ -86,7 +86,7 @@ public class SimpleSpectralDeconvolutionTask extends AbstractTask {
             LOG.info("Started ADAP Peak Decomposition on " + peakList);
 
             // Check raw data files.
-            if (peakList.getNumberOfRawDataFiles() != 1) {
+            if (peakList.getNumberOfRawDataFiles() == 0) {
                 setStatus(TaskStatus.ERROR);
                 setErrorMessage("Peak Decomposition can only be performed on peak lists with a single raw data file");
             } else {

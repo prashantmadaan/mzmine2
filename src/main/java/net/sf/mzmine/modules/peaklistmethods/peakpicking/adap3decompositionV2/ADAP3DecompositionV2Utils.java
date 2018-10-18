@@ -5,6 +5,7 @@ import dulab.adap.datamodel.Chromatogram;
 import dulab.adap.datamodel.Peak;
 import dulab.adap.datamodel.PeakInfo;
 import net.sf.mzmine.datamodel.*;
+import net.sf.mzmine.parameters.parametertypes.DoubleParameter;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -23,7 +24,7 @@ public class ADAP3DecompositionV2Utils
 {
     private final Logger log;
     
-    private final Map<Integer, Double> retTimes;
+    private final Map<RawDataFile, Map<Integer, Double>> retTimes;
 
     public ADAP3DecompositionV2Utils() {
         this.log = Logger.getLogger(ADAP3DecompositionV2Task.class.getName());
@@ -39,15 +40,15 @@ public class ADAP3DecompositionV2Utils
     @Nonnull
     public List<BetterPeak> getPeaks(@Nonnull final PeakList peakList)
     {
-        RawDataFile dataFile = peakList.getRawDataFile(0);
-
         List<BetterPeak> peaks = new ArrayList<>();
         
         for (PeakListRow row : peakList.getRows())
         {
             Feature peak = row.getBestPeak();
+            RawDataFile dataFile = peak.getDataFile();
             int[] scanNumbers = peak.getScanNumbers();
 
+            peak.getDataFile();
 
             // Build chromatogram
             double[] retTimes = new double[scanNumbers.length];
@@ -106,11 +107,16 @@ public class ADAP3DecompositionV2Utils
     }
     
     private double getRetTime(RawDataFile dataFile, int scan) {
-        Double retTime = retTimes.get(scan);
-        if (retTime == null) {
-            retTime = dataFile.getScan(scan).getRetentionTime();
-            retTimes.put(scan, retTime);
-        }
-        return retTime;
+        Map<Integer, Double> scanRetTimeMap = retTimes.computeIfAbsent(dataFile, f -> new HashMap<>());
+        return scanRetTimeMap.computeIfAbsent(
+                scan,
+                s -> dataFile.getScan(s).getRetentionTime());
+
+//        Double retTime = retTimes.get(scan);
+//        if (retTime == null) {
+//            retTime = dataFile.getScan(scan).getRetentionTime();
+//            retTimes.put(scan, retTime);
+//        }
+//        return retTime;
     }
 }
