@@ -18,7 +18,10 @@
 
 package net.sf.mzmine.modules.peaklistmethods.dataanalysis.significance;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,10 +31,13 @@ import net.sf.mzmine.datamodel.*;
 import net.sf.mzmine.datamodel.impl.SimplePeakInformation;
 import net.sf.mzmine.taskcontrol.AbstractTask;
 import net.sf.mzmine.taskcontrol.TaskStatus;
+import smile.stat.hypothesis.TTest;
 
 public class SignificanceTask extends AbstractTask {
 
     private static final String SIGNIFICANCE_KEY = "SIGNIFICANCE";
+    private static final String P_VALUE_KEY = "P_Value";
+    private static final String T_VALUE_KEY = "T_Value";
 
     private Logger logger = Logger.getLogger(this.getClass().getName());
     private double finishedPercentage = 0.0;
@@ -106,12 +112,19 @@ public class SignificanceTask extends AbstractTask {
 
             double controlIntensity = 0.0;
             double experimentalIntensity = 0.0;
+            List<Double> ControlGroupIntensities= new ArrayList<Double>();
+            List<Double> experimentalGroupIntensities= new ArrayList<Double>();
 
             for (Feature peak : row.getPeaks()) {
-                if (controlGroup.getFiles().contains(peak.getDataFile()))
+                if (controlGroup.getFiles().contains(peak.getDataFile())) {
                     controlIntensity += peak.getHeight();
-                if (experimentalGroup.getFiles().contains(peak.getDataFile()))
+                    ControlGroupIntensities.add(peak.getHeight());
+                }
+                if (experimentalGroup.getFiles().contains(peak.getDataFile())) {
                     experimentalIntensity += peak.getHeight();
+                    experimentalGroupIntensities.add(peak.getHeight());
+                }
+                
             }
 
             controlIntensity /= controlGroup.getFiles().size();
@@ -131,9 +144,22 @@ public class SignificanceTask extends AbstractTask {
             if (peakInformation == null)
                 peakInformation = new SimplePeakInformation();
 
+            
+            TTest tTest= TTest.test(convertListToArray(ControlGroupIntensities), convertListToArray(experimentalGroupIntensities), false);
+            peakInformation.getAllProperties().put(P_VALUE_KEY, Double.toString(tTest.pvalue));
+            peakInformation.getAllProperties().put(T_VALUE_KEY, Double.toString(tTest.t));
             peakInformation.getAllProperties().put(SIGNIFICANCE_KEY, Double.toString(significance));
             row.setPeakInformation(peakInformation);
         }
+    }
+    
+    public double[] convertListToArray(List<Double> list) {
+    	double [] result = new double[list.size()];
+    	for(int i=0;i<list.size();i++) {
+    		result[i]=list.get(i);
+    	}
+    	
+    	return result;
     }
 
     public static Group getGroup(PeakListRow[] rows, String template) {
