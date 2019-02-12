@@ -45,7 +45,7 @@ public class MummichogParameters extends SimpleParameterSet {
  //   public static final StringParameter output = new StringParameter("Output",
   //          "Output directory","default");
     public static final ComboParameter<String> network = new ComboParameter<String>(
-    	    "Netowork",
+    	    "Network",
     	    "Metion the model to be used",
     	    new String[] { "human","worm" }, "human");
     public static final ComboParameter<String> modeling = new ComboParameter<String>(
