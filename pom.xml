@@ -671,6 +671,11 @@
 			<artifactId>jcommon</artifactId>
 			<version>1.0.23</version>
 		</dependency>
+	<dependency>
+		<groupId>org.du-lab.Mummichog</groupId>
+		<artifactId>Mummichog</artifactId>
+		<version>1.0.2</version>
+	</dependency>
 		<!-- Mummichog Dependencies end -->
 	</dependencies>
 
