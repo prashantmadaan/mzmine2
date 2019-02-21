@@ -34,6 +34,7 @@ import net.sf.mzmine.modules.peaklistmethods.dataanalysis.projectionplots.Sammon
 import net.sf.mzmine.modules.peaklistmethods.dataanalysis.rtmzplots.cvplot.CVPlotModule;
 import net.sf.mzmine.modules.peaklistmethods.dataanalysis.rtmzplots.logratioplot.LogratioPlotModule;
 import net.sf.mzmine.modules.peaklistmethods.dataanalysis.significance.SignificanceModule;
+import net.sf.mzmine.modules.peaklistmethods.dataanalysis.mummichog.MummichogModule;
 import net.sf.mzmine.modules.peaklistmethods.filtering.clearannotations.PeaklistClearAnnotationsModule;
 import net.sf.mzmine.modules.peaklistmethods.filtering.duplicatefilter.DuplicateFilterModule;
 import net.sf.mzmine.modules.peaklistmethods.filtering.peakcomparisonrowfilter.PeakComparisonRowFilterModule;
@@ -171,6 +172,7 @@ public class MZmineModulesList {
       // Data analysis
       CVPlotModule.class, LogratioPlotModule.class, PCAPlotModule.class, CDAPlotModule.class,
       SammonsPlotModule.class, ClusteringModule.class, HeatMapModule.class, SignificanceModule.class,
+      MummichogModule.class,
 
       // Identification
       CustomDBSearchModule.class, FormulaPredictionModule.class, FragmentSearchModule.class,
