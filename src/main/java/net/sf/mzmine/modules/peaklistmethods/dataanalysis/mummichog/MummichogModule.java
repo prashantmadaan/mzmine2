@@ -32,54 +32,49 @@ import net.sf.mzmine.util.ExitCode;
 
 public class MummichogModule implements MZmineRunnableModule {
 
-    private static final String MODULE_NAME = "Mummichog calculation";
-    private static final String MODULE_DESCRIPTION = "Builds an Activity Network after doing pathway and modular analysis";
+	private static final String MODULE_NAME = "Mummichog calculation";
+	private static final String MODULE_DESCRIPTION = "Builds an Activity Network after doing pathway and modular analysis";
 
-    @Override
-    public @Nonnull String getName() {
-        return MODULE_NAME;
-    }
+	@Override
+	public @Nonnull String getName() {
+		return MODULE_NAME;
+	}
 
-    @Override
-    public @Nonnull String getDescription() {
-        return MODULE_DESCRIPTION;
-    }
+	@Override
+	public @Nonnull String getDescription() {
+		return MODULE_DESCRIPTION;
+	}
 
-    @Override
-    @Nonnull
-    public ExitCode runModule(@Nonnull MZmineProject project,
-            @Nonnull ParameterSet parameters, @Nonnull Collection<Task> tasks) {
+	@Override
+	@Nonnull
+	public ExitCode runModule(@Nonnull MZmineProject project, @Nonnull ParameterSet parameters,
+			@Nonnull Collection<Task> tasks) {
 
-    	//peakLists, cutoff, network, force_primary_ion,modeling,mode,output
-        String cutoff = parameters.getParameter(MummichogParameters.cutoff).getValue();
-        String network = parameters.getParameter(MummichogParameters.network).getValue();
-        String force_primary_ion = parameters.getParameter(MummichogParameters.force_primary_ion).getValue().toString();
-        String modeling = parameters.getParameter(MummichogParameters.modeling).getValue();
-        String mode = parameters.getParameter(MummichogParameters.mode).getValue();
-        File output = parameters.getParameter(MummichogParameters.output).getValue();
-    		//String paramaters = parameters.getParameter(MummichogParameters.params).getValue();
-       
+		String cutoff = parameters.getParameter(MummichogParameters.cutoff).getValue();
+		String network = parameters.getParameter(MummichogParameters.network).getValue();
+		String force_primary_ion = parameters.getParameter(MummichogParameters.force_primary_ion).getValue().toString();
+		String modeling = parameters.getParameter(MummichogParameters.modeling).getValue();
+		String mode = parameters.getParameter(MummichogParameters.mode).getValue();
+		File output = parameters.getParameter(MummichogParameters.output).getValue();
 
-        PeakList[] peakLists = parameters
-                .getParameter(MummichogParameters.peakLists).getValue()
-                .getMatchingPeakLists();
+		PeakList[] peakLists = parameters.getParameter(MummichogParameters.peakLists).getValue().getMatchingPeakLists();
 
-        for (PeakList peakList : peakLists) {
-        	
-            tasks.add(new MummichogTask(peakList.getRows(), cutoff, network,force_primary_ion,modeling,mode,output));
-        	// tasks.add(new MummichogTask(peakList.getRows(), paramaters));
-        }
+		for (PeakList peakList : peakLists) {
 
-        return ExitCode.OK;
+			tasks.add(
+					new MummichogTask(peakList.getRows(), cutoff, network, force_primary_ion, modeling, mode, output));
+		}
 
-    }
+		return ExitCode.OK;
 
-    public @Nonnull MZmineModuleCategory getModuleCategory() {
-        return MZmineModuleCategory.DATAANALYSIS;
-    }
+	}
 
-    @Override
-    public @Nonnull Class<? extends ParameterSet> getParameterSetClass() {
-        return MummichogParameters.class;
-    }
+	public @Nonnull MZmineModuleCategory getModuleCategory() {
+		return MZmineModuleCategory.DATAANALYSIS;
+	}
+
+	@Override
+	public @Nonnull Class<? extends ParameterSet> getParameterSetClass() {
+		return MummichogParameters.class;
+	}
 }
