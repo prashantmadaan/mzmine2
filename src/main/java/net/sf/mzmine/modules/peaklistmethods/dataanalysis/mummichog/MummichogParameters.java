@@ -30,19 +30,18 @@ public class MummichogParameters extends SimpleParameterSet {
 
 	public static final PeakListsParameter peakLists = new PeakListsParameter(1, 1);
 
-	public static final StringParameter cutoff = new StringParameter("Cutoff", "Cutoff Value", "0.05");
-	public static final StringParameter mode = new StringParameter("Mode", "Mode", "pos_default");
-	public static final ComboParameter<String> network = new ComboParameter<String>("Network",
-			"Metion the model to be used", new String[] { "human", "worm" }, "human");
-	public static final ComboParameter<String> modeling = new ComboParameter<String>("Modeling",
-			"Metion the fitting to be used", new String[] { "Non-Parametric", "Gamma" }, "Non-Parametric");
+	public static final StringParameter cutoff = new StringParameter("Significance Cutoff", "Significance cutoff p-value in input file", "0.05");
+	public static final ComboParameter<String> network = new ComboParameter<String>("Metabolic Network",
+			"Choose the metabolic network to be used", new String[] { "human", "worm" }, "human");
+	public static final ComboParameter<String> modeling = new ComboParameter<String>("Distriution Estimator",
+			"Choose the type of estimation to be used", new String[] { "Non-Parametric", "Gamma" }, "Non-Parametric");
 
-	public static final BooleanParameter force_primary_ion = new BooleanParameter("Force Primary ion",
-			"Force Primary Ion", true);
+	public static final BooleanParameter force_primary_ion = new BooleanParameter("Primary Ion Mandate",
+			"Enforce Primary Ion in Empirical Compunds", true);
 
-	public static final DirectoryParameter output = new DirectoryParameter("Output", "Output directory");
+	public static final DirectoryParameter output = new DirectoryParameter("Output Directory", "Output directory");
 
 	public MummichogParameters() {
-		super(new Parameter[] { peakLists, cutoff, network, force_primary_ion, modeling, mode, output });
+		super(new Parameter[] { peakLists, cutoff, network, force_primary_ion, modeling, output });
 	}
 }

@@ -52,7 +52,7 @@ public class MummichogTask extends AbstractTask {
 	private final String network;
 	private final String force_primary_ion;
 	private final String modeling;
-	private final String mode;
+//	private final String mode;
 	private final File output;
 
 	public String getTaskDescription() {
@@ -60,14 +60,14 @@ public class MummichogTask extends AbstractTask {
 	}
 
 	public MummichogTask(PeakListRow[] peakListRows, String cutoff, String network, String force_primary_ion,
-			String modeling, String mode, File output) {
+			String modeling, File output) {
 		super();
 		this.peakListRows = peakListRows;
 		this.cutoff = cutoff;
 		this.network = network;
 		this.force_primary_ion = force_primary_ion;
 		this.modeling = modeling;
-		this.mode = mode;
+	//	this.mode = mode;
 		this.output = output;
 	}
 
@@ -92,10 +92,10 @@ public class MummichogTask extends AbstractTask {
 			arguments[5] = this.force_primary_ion;
 			arguments[6] = "--modeling";
 			arguments[7] = this.modeling;
-			arguments[8] = "--mode";
-			arguments[9] = this.mode;
-			arguments[10] = "--output";
-			arguments[11] = this.output.getAbsolutePath();
+			//arguments[8] = "--mode";
+			//arguments[9] = this.mode;
+			arguments[8] = "--output";
+			arguments[9] = this.output.getAbsolutePath();
 
 			@SuppressWarnings("unused")
 			Map<String, List<Compound>> mummiOutput = emc.runMummiChog(input, arguments);
