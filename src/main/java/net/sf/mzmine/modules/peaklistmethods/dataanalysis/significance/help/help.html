@@ -1,90 +1,43 @@
 <html>
         <head>
-                <title>Data analysis - Heat map plot</title>
+                <title>Data analysis - Significance Calculation</title>
                 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
                 <link rel="stylesheet" type="text/css" href="/net/sf/mzmine/desktop/impl/helpsystem/HelpStyles.css">
         </head>
 
         <body>
 
-                <h1>Heat map plot</h1>
+                <h1>Significance Calculation</h1>
 
                 <h2>Description</h2>
                 <p>
-                        A heat map is a graphical representation of data where the values taken by a variable in a two-dimensional
-                        table are represented as colors.
-                        It is a false color image with a dendrogram added to the left side and to the top.
-                        Reordering of the rows and columns according to some set of values (row or column means)
-                        within the restrictions imposed by the dendrogram is carried out.
+                       Mummichog is an algorithm for analyzing data from high throughput, untargeted metabolomics. It leverages the organization of metabolic networks to predict functional activity directly from feature tables, bypassing metabolite identification. Thus, high-quality hypotheses can be quickly generated from a LC-MS data table. The algorithm runs on the Aligned peak lists and performs Modular and Pathway analysis using an existing Human or Worm metabolical networks. The calculation edits the aligned peak list with addition in compound information against each mz-retion_time row. The calculation also prpduces three csv files which have the list of empirical compunds, top modules from modular analysis and the results from pathway analysis.
 
                         <br> <br>
 
-                        This module is using the R function "heatmap.2" to draw the heat map plot.                         
-                        The function description can be found here:
+                        The algorithm was first developed in python. For more information visit the below link.
 
                         <br>
-                        <a href="http://hosho.ees.hokudai.ac.jp/~kubo/Rdoc/library/gplots/html/heatmap.2.html">http://hosho.ees.hokudai.ac.jp/~kubo/Rdoc/library/gplots/html/heatmap.2.html </a>
+                        <a href="http://mummichog.org/">http://mummichog.org/</a>
                 </p>
                 <br>
                 <p>
-                        <img src="heatmap.png" name="Heat map plot">
-                        <img src="heatmapgrouping.png" name="Heat map plot using p-value legend">
+                        <img src="Significance.png" name="mummichog screen">
                 </p>
 
                 <h4>Method parameters</h4>
                 <dl>
-                        <dt>Output name</dt>
-                        <dd>Path of the heat map plot output file.</dd>
+                        <dt><b>Peak lists</b></dt>
+                        <dd>Displays all the selected peak lists for calculation. 
+                            <br></dd>
 
-                        <dt>Output file type</dt>
-                        <dd>The output file can be "pdf", "svg", "png" or "fig". The height and width of the plot depend on the type of file.
-                                In the case of "png" type, the height and width have to be more than 500. </dd>
+                        <dt><b>Experimental Group Name</b></dt>
+                        <dd>This drop down option lets user to chose a base metabolic network on basis of which the calculation is done. The algorithm supports Human and Worm metabolic network in current version.
+                         <br></dd>
 
-                        <dt>Sample parameter</dt>
-                        <dd>Description of the samples defined by the user in "Project-> Set sample parameters" section. There has to be at
-                                least two groups. One of the groups will be used as a reference group and the rest of the groups will be compared to it.</dd>
-
-                        <dt>Group of reference</dt>
-                        <dd>Name of the group used as a reference by the heat map plot. The rest of the groups defined in the sample parameters
-                                will be compared to it </dd>
-
-                        <dt>Only identified rows</dt>
-                        <dd>Only identified rows will be plotted.</dd>
-
-                        <dt>Use peak area</dt>
-                        <dd>If it is selected the peak area will be used to create the heat map plot. If it is not selected peak height will be used.</dd>
-
-                        <dt>Scaling</dt>
-                        <dd>The data will be scaled using the standard deviation of the values of all the rows in each sample.</dd>
-
-                        <dt>Log</dt>
-                        <dd>Log transformation of the data.</dd>
-
-                        <dt>Show control samples</dt>
-                        <dd>The samples in the reference group will be shown if this option is selected. It is only valid when P-value legend is not
-                                selected and the individual samples are plotted.</dd>
-
-                        <dt>P-value legend</dt>
-                        <dd>If this option is selected the mean of each group will be compared with the mean of the reference group using T-test.
-                                The plot will show the groups instead the individual samples and the significance (depending on the p-value) of their mean differences.
-                                If the p-value is less than 0.001, "***" will be printed into the corresponding cell. If the p-value is between than 0.01 and 0.001,
-                                "**" will be printed, and if it is between 0.05 and 0.01, "*" will be printed into the corresponding cell. </dd>
-
-                        <dt>Size p-value legend</dt>
-                        <dd>Size of the "*" in the heat map plot.</dd>
-
-                        <dt>Height</dt>
-                        <dd>Height of the heat map plot.</dd>
-
-                        <dt>Width</dt>
-                        <dd>Width of the heat map plot.</dd>
-
-                        <dt>Column margin</dt>
-                        <dd>Column margin of the heat map plot.</dd>
-
-                        <dt>Row margin</dt>
-                        <dd>Row margin of the heat map plot.</dd>
-
+                        <dt><b>Control Group Name</b></dt>
+                        <dd>The checkbox option lets user specify if they want to enforce presence of primary ion while creating empirical compounds.
+                         <br></dd>
 
                 </dl>
 
