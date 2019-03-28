@@ -141,6 +141,8 @@ public class SignificanceTask extends AbstractTask {
                         convertListToArray(experimentalGroupIntensities), false);
             } catch (IllegalArgumentException e) {
                 logger.warning(e.getMessage());
+            } catch (StackOverflowError e) {
+                logger.warning("Stack Overflow Error");
             }
 
             if (tTest != null) {
