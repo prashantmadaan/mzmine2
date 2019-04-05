@@ -37,6 +37,7 @@ import net.sf.mzmine.datamodel.impl.SimplePeakInformation;
 import net.sf.mzmine.taskcontrol.AbstractTask;
 import net.sf.mzmine.taskcontrol.TaskStatus;
 import pojo.Compound;
+import pojo.MummichogParams;
 
 public class MummichogTask extends AbstractTask {
 
@@ -82,23 +83,11 @@ public class MummichogTask extends AbstractTask {
 		try {
 			String input = prepareData();
 			ExecuteMummiChog emc = new ExecuteMummiChog();
-			String[] arguments = new String[12];
-
-			arguments[0] = "--cutoff";
-			arguments[1] = this.cutoff;
-			arguments[2] = "--network";
-			arguments[3] = this.network;
-			arguments[4] = "--force_primary_ion";
-			arguments[5] = this.force_primary_ion;
-			arguments[6] = "--modeling";
-			arguments[7] = this.modeling;
-			//arguments[8] = "--mode";
-			//arguments[9] = this.mode;
-			arguments[8] = "--output";
-			arguments[9] = this.output.getAbsolutePath();
-
+			
+			MummichogParams mummiParameters= new MummichogParams(Double.parseDouble(this.cutoff),this.network,Boolean.parseBoolean(this.force_primary_ion),this.modeling,this.output.getAbsolutePath());
+			
 			@SuppressWarnings("unused")
-			Map<String, List<Compound>> mummiOutput = emc.runMummiChog(input, arguments);
+			Map<String, List<Compound>> mummiOutput = emc.runMummiChog(input, mummiParameters);
 
 			// Code to update the allign peak list
 			for (String mzr : mummiOutput.keySet()) {
