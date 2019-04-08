@@ -18,10 +18,13 @@
 
 package net.sf.mzmine.modules.peaklistmethods.dataanalysis.mummichog;
 
+import java.text.DecimalFormat;
+
 import net.sf.mzmine.parameters.Parameter;
 import net.sf.mzmine.parameters.impl.SimpleParameterSet;
 import net.sf.mzmine.parameters.parametertypes.BooleanParameter;
 import net.sf.mzmine.parameters.parametertypes.ComboParameter;
+import net.sf.mzmine.parameters.parametertypes.DoubleParameter;
 import net.sf.mzmine.parameters.parametertypes.StringParameter;
 import net.sf.mzmine.parameters.parametertypes.filenames.DirectoryParameter;
 import net.sf.mzmine.parameters.parametertypes.selectors.PeakListsParameter;
@@ -30,7 +33,7 @@ public class MummichogParameters extends SimpleParameterSet {
 
 	public static final PeakListsParameter peakLists = new PeakListsParameter(1, 1);
 
-	public static final StringParameter cutoff = new StringParameter("Significance Cutoff", "Significance cutoff p-value in input file", "0.05");
+	public static final DoubleParameter cutoff = new DoubleParameter("Significance Cutoff", "Significance cutoff p-value in input file", DecimalFormat.getInstance() ,0.05);
 	public static final ComboParameter<String> network = new ComboParameter<String>("Metabolic Network",
 			"Choose the metabolic network to be used", new String[] { "human", "worm" }, "human");
 	public static final ComboParameter<String> modeling = new ComboParameter<String>("Distriution Estimator",

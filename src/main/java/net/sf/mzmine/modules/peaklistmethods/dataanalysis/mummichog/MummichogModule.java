@@ -50,7 +50,7 @@ public class MummichogModule implements MZmineRunnableModule {
 	public ExitCode runModule(@Nonnull MZmineProject project, @Nonnull ParameterSet parameters,
 			@Nonnull Collection<Task> tasks) {
 
-		String cutoff = parameters.getParameter(MummichogParameters.cutoff).getValue();
+		double cutoff = parameters.getParameter(MummichogParameters.cutoff).getValue();
 		String network = parameters.getParameter(MummichogParameters.network).getValue();
 		String force_primary_ion = parameters.getParameter(MummichogParameters.force_primary_ion).getValue().toString();
 		String modeling = parameters.getParameter(MummichogParameters.modeling).getValue();

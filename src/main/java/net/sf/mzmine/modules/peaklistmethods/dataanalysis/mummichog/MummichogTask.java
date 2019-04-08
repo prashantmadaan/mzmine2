@@ -42,9 +42,9 @@ public class MummichogTask extends AbstractTask {
     private double finishedPercentage = 0.0;
 
     private final PeakListRow[] peakListRows;
-    private final String cutoff;
+    private final double cutoff;
     private final String network;
-    private final String force_primary_ion;
+    private final boolean force_primary_ion;
     private final String modeling;
     private final File output;
 
@@ -52,13 +52,13 @@ public class MummichogTask extends AbstractTask {
         return "Calculating Mummichog... ";
     }
 
-    public MummichogTask(PeakListRow[] peakListRows, String cutoff, String network, String force_primary_ion,
+    public MummichogTask(PeakListRow[] peakListRows, double cutoff, String network, String force_primary_ion,
                          String modeling, File output) {
         super();
         this.peakListRows = peakListRows;
         this.cutoff = cutoff;
         this.network = network;
-        this.force_primary_ion = force_primary_ion;
+        this.force_primary_ion = Boolean.parseBoolean(force_primary_ion);
         this.modeling = modeling;
         //	this.mode = mode;
         this.output = output;
@@ -76,7 +76,7 @@ public class MummichogTask extends AbstractTask {
             String input = prepareData();
             ExecuteMummiChog emc = new ExecuteMummiChog();
 
-			MummichogParams mummiParameters= new MummichogParams(Double.parseDouble(this.cutoff),this.network,Boolean.parseBoolean(this.force_primary_ion),this.modeling,this.output.getAbsolutePath());
+			MummichogParams mummiParameters= new MummichogParams(this.cutoff,this.network,this.force_primary_ion,this.modeling,this.output.getAbsolutePath());
 
 
             @SuppressWarnings("unused")
