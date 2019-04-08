@@ -19,21 +19,15 @@
 package net.sf.mzmine.modules.peaklistmethods.dataanalysis.mummichog;
 
 import java.io.File;
-import java.io.PrintWriter;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
-import org.apache.commons.io.FileUtils;
 
 import driver.ExecuteMummiChog;
 import net.sf.mzmine.datamodel.*;
 import net.sf.mzmine.datamodel.impl.SimplePeakIdentity;
-import net.sf.mzmine.datamodel.impl.SimplePeakInformation;
 import net.sf.mzmine.taskcontrol.AbstractTask;
 import net.sf.mzmine.taskcontrol.TaskStatus;
 import pojo.Compound;
@@ -41,7 +35,6 @@ import pojo.MummichogParams;
 
 public class MummichogTask extends AbstractTask {
 
-    private static final String SIGNIFICANCE_KEY = "SIGNIFICANCE";
     private static final String P_VALUE_KEY = "P_Value";
     private static final String T_VALUE_KEY = "T_Value";
 
@@ -53,7 +46,6 @@ public class MummichogTask extends AbstractTask {
     private final String network;
     private final String force_primary_ion;
     private final String modeling;
-    //	private final String mode;
     private final File output;
 
     public String getTaskDescription() {
@@ -83,20 +75,7 @@ public class MummichogTask extends AbstractTask {
         try {
             String input = prepareData();
             ExecuteMummiChog emc = new ExecuteMummiChog();
-            String[] arguments = new String[10];
 
-            arguments[0] = "--cutoff";
-            arguments[1] = this.cutoff;
-            arguments[2] = "--network";
-            arguments[3] = this.network;
-            arguments[4] = "--force_primary_ion";
-            arguments[5] = this.force_primary_ion;
-            arguments[6] = "--modeling";
-            arguments[7] = this.modeling;
-            //arguments[8] = "--mode";
-            //arguments[9] = this.mode;
-            arguments[8] = "--output";
-            arguments[9] = this.output.getAbsolutePath();
 			MummichogParams mummiParameters= new MummichogParams(Double.parseDouble(this.cutoff),this.network,Boolean.parseBoolean(this.force_primary_ion),this.modeling,this.output.getAbsolutePath());
 
 
@@ -147,15 +126,6 @@ public class MummichogTask extends AbstractTask {
                         .append("randomText");
                 result.append("\n");
             }
-//            if (pr.getPeakInformation().getAllProperties().containsKey("SIGNIFICANCE")) {
-//                result.append(pr.getAverageMZ()).append("\t").append(pr.getAverageRT()).append("\t")
-//                        .append(pr.getPeakInformation().getAllProperties().get(P_VALUE_KEY)).append("\t")
-//                        .append(pr.getPeakInformation().getAllProperties().get(T_VALUE_KEY)).append("\t")
-//                        .append("randomText");
-//                result.append("\n");
-//            } else {
-//                throw new Exception("P Value property not present in one or many records during Mummichog calculation");
-//            }
         }
         return result.toString();
     }
