@@ -30,11 +30,10 @@ import net.sf.mzmine.parameters.parametertypes.ComboParameter;
 import net.sf.mzmine.parameters.parametertypes.DoubleParameter;
 import net.sf.mzmine.parameters.parametertypes.IntegerParameter;
 import net.sf.mzmine.parameters.parametertypes.MassListParameter;
-import net.sf.mzmine.parameters.parametertypes.OptionalModuleParameter;
 import net.sf.mzmine.parameters.parametertypes.OptionalParameter;
-import net.sf.mzmine.parameters.parametertypes.PercentParameter;
 import net.sf.mzmine.parameters.parametertypes.StringParameter;
 import net.sf.mzmine.parameters.parametertypes.selectors.PeakListsParameter;
+import net.sf.mzmine.parameters.parametertypes.submodules.OptionalModuleParameter;
 import net.sf.mzmine.parameters.parametertypes.tolerances.MZToleranceParameter;
 import net.sf.mzmine.parameters.parametertypes.tolerances.RTToleranceParameter;
 import net.sf.mzmine.util.ExitCode;
@@ -55,15 +54,10 @@ public class IsotopePeakScannerParameters extends SimpleParameterSet {
 
   public static final RTToleranceParameter rtTolerance = new RTToleranceParameter();
 
-  public static final StringParameter element = new StringParameter("Element pattern",
+  public static final StringParameter element = new StringParameter("Chemical formula",
       "Element (combination) whose isotope pattern to be searched for. Please enter the two letter Symbol."
           + " (e.g. \"Gd\", \"Cl2BrS\")",
       "", false);
-
-  public static final PercentParameter minAbundance = new PercentParameter("Minimum abundance",
-      "The minimum abundance (%) of Isotopes. Small values "
-          + "might increase accuracy but will decrease sensitivity.",
-      0.01);
 
   public static final DoubleParameter minHeight = new DoubleParameter("Minimum height",
       "Minimum peak height to be considered as an isotope peak.",
@@ -80,8 +74,8 @@ public class IsotopePeakScannerParameters extends SimpleParameterSet {
               + "Depends on the sensitivity of your MS.\nMin = 0.0, Max = 0.99...",
           new DecimalFormat("0.####"), 0.01, 0.0d, 0.99999);
 
-  public static final BooleanParameter checkIntensity = new BooleanParameter("Check intensity ratios",
-      "Compare intensity of peaks to the calculated abundance.", true);
+  public static final BooleanParameter checkIntensity = new BooleanParameter(
+      "Check intensity ratios", "Compare intensity of peaks to the calculated abundance.", true);
 
   public static final DoubleParameter minRating = new DoubleParameter("Minimun rating",
       "Minimum rating to be considered as an isotope peak. min = 0.0, max = 1.0",
@@ -121,10 +115,11 @@ public class IsotopePeakScannerParameters extends SimpleParameterSet {
 
   public IsotopePeakScannerParameters() {
     super(new Parameter[] {PEAK_LISTS, mzTolerance, checkRT, rtTolerance, element, autoCarbonOpt,
-        charge, minAbundance, minPatternIntensity, mergeWidth, showPreview, minHeight,
-        checkIntensity, minRating, ratingChoices, massList, suffix});
+        charge, minPatternIntensity, mergeWidth, showPreview, minHeight, checkIntensity, minRating,
+        ratingChoices, massList, suffix});
   }
 
+  @Override
   public ExitCode showSetupDialog(Window parent, boolean valueCheckRequired) {
     if ((getParameters() == null) || (getParameters().length == 0))
       return ExitCode.OK;

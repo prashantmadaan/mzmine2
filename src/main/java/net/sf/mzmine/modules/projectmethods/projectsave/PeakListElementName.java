@@ -27,14 +27,17 @@ enum PeakListElementName {
                   "information"), INFO_PROPERTY("information_property"), PEAK_IDENTITY(
                       "identity"), PREFERRED("preferred"), IDPROPERTY("identity_property"), NAME(
                           "name"), COMMENT("comment"), PEAK("peak"), ISOTOPE_PATTERN(
-                              "isotope_pattern"), DESCRIPTION(
-                                  "description"), CHARGE("charge"), ISOTOPE("isotope"), MZPEAKS(
-                                      "mzpeaks"), METHOD("applied_method"), METHOD_NAME(
+                              "isotope_pattern"), DESCRIPTION("description"), CHARGE(
+                                  "charge"), ISOTOPE("isotope"), MZPEAKS("mzpeaks"), METHOD(
+                                      "applied_method"), METHOD_NAME(
                                           "method_name"), METHOD_PARAMETERS(
                                               "method_parameters"), REPRESENTATIVE_SCAN(
                                                   "best_scan"), FRAGMENT_SCAN(
-                                                      "fragment_scan"), INDEX(
-                                                          "index"), SHARPNESS("sharpness");
+                                                      "fragment_scan"), ALL_MS2_FRAGMENT_SCANS(
+                                                          "all_MS2_fragment_scans"), INDEX(
+                                                              "index"), SHARPNESS(
+                                                                  "sharpness"), PARENT_CHROMATOGRAM_ROW_ID(
+                                                                          "parent_chromatogram_row_id");
   private String elementName;
 
   private PeakListElementName(String itemName) {

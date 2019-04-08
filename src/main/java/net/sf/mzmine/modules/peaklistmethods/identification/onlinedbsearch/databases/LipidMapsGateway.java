@@ -21,10 +21,11 @@ package net.sf.mzmine.modules.peaklistmethods.identification.onlinedbsearch.data
 import java.io.IOException;
 import java.net.URL;
 import java.util.Vector;
+import java.util.logging.Logger;
 
 import net.sf.mzmine.modules.peaklistmethods.identification.onlinedbsearch.DBCompound;
 import net.sf.mzmine.modules.peaklistmethods.identification.onlinedbsearch.DBGateway;
-import net.sf.mzmine.modules.peaklistmethods.identification.onlinedbsearch.OnlineDatabase;
+import net.sf.mzmine.modules.peaklistmethods.identification.onlinedbsearch.OnlineDatabases;
 import net.sf.mzmine.parameters.ParameterSet;
 import net.sf.mzmine.parameters.parametertypes.tolerances.MZTolerance;
 import net.sf.mzmine.util.InetUtils;
@@ -33,6 +34,8 @@ import net.sf.mzmine.util.RangeUtils;
 import com.google.common.collect.Range;
 
 public class LipidMapsGateway implements DBGateway {
+
+  private Logger logger = Logger.getLogger(this.getClass().getName());
 
   public static final String lipidMapsSearchAddress =
       "http://www.lipidmaps.org/data/structure/LMSDSearch.php?Mode=ProcessTextSearch&OutputMode=File&OutputColumnHeader=No&";
@@ -52,9 +55,10 @@ public class LipidMapsGateway implements DBGateway {
         lipidMapsSearchAddress + "ExactMass=" + RangeUtils.rangeCenter(toleranceRange)
             + "&ExactMassOffSet=" + (RangeUtils.rangeLength(toleranceRange) / 2);
 
-    URL queryURL = new URL(queryAddress);
+    final URL queryURL = new URL(queryAddress);
 
     // Submit the query
+    logger.finest("Searching LipidMaps via URL " + queryURL.toString());
     String queryResult = InetUtils.retrieveData(queryURL);
 
     Vector<String> results = new Vector<String>();
@@ -77,8 +81,9 @@ public class LipidMapsGateway implements DBGateway {
    */
   public DBCompound getCompound(String ID, ParameterSet parameters) throws IOException {
 
-    URL entryURL = new URL(lipidMapsEntryAddress + ID);
+    final URL entryURL = new URL(lipidMapsEntryAddress + ID);
 
+    logger.finest("Loading data from LipidMaps via URL " + entryURL.toString());
     String lipidMapsEntry = InetUtils.retrieveData(entryURL);
 
     String fields[] = lipidMapsEntry.split("\t");
@@ -101,7 +106,7 @@ public class LipidMapsGateway implements DBGateway {
     URL structure3DURL = null;
     URL databaseURL = new URL(lipidMapsDetailsAddress + ID);
 
-    DBCompound newCompound = new DBCompound(OnlineDatabase.LIPIDMAPS, ID, compoundName,
+    DBCompound newCompound = new DBCompound(OnlineDatabases.LIPIDMAPS, ID, compoundName,
         compoundFormula, databaseURL, structure2DURL, structure3DURL);
 
     return newCompound;

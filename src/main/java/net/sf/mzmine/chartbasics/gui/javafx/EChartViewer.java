@@ -247,7 +247,7 @@ public class EChartViewer extends ChartViewer {
       for (GestureHandlerFactory f : ChartGestureHandler.getStandardGestures())
         m.addGestureHandler(f.createHandler());
 
-      logger.log(Level.INFO, "Added standard gestures: " + m.getGestureHandlers().size());
+      logger.log(Level.FINEST, "Added standard gestures: " + m.getGestureHandlers().size());
     }
   }
 
@@ -413,9 +413,7 @@ public class EChartViewer extends ChartViewer {
    * Returns the {@link ChartGestureMouseAdapter} alternatively for other ChartPanel classes use:
    * 
    * <pre>
-   * for(MouseListener l : getMouseListeners())
-   *    if(ChartGestureMouseAdapter.class.isInstance(l)){
-   *        ChartGestureMouseAdapter m = (ChartGestureMouseAdapter) l;
+   * this.getCanvas().addAuxiliaryMouseHandler(handler);
    * </pre>
    * 
    * @return

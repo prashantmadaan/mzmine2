@@ -12,7 +12,24 @@
 
 package net.sf.mzmine.modules.peaklistmethods.io.siriusexport;
 
-import net.sf.mzmine.datamodel.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.regex.Pattern;
+import org.apache.commons.math3.special.Erf;
+import net.sf.mzmine.datamodel.DataPoint;
+import net.sf.mzmine.datamodel.Feature;
+import net.sf.mzmine.datamodel.MassList;
+import net.sf.mzmine.datamodel.PeakList;
+import net.sf.mzmine.datamodel.PeakListRow;
+import net.sf.mzmine.datamodel.RawDataFile;
+import net.sf.mzmine.datamodel.Scan;
 import net.sf.mzmine.datamodel.impl.SimpleDataPoint;
 import net.sf.mzmine.parameters.ParameterSet;
 import net.sf.mzmine.taskcontrol.AbstractTask;
@@ -20,14 +37,6 @@ import net.sf.mzmine.taskcontrol.TaskStatus;
 import net.sf.mzmine.util.DataPointSorter;
 import net.sf.mzmine.util.SortingDirection;
 import net.sf.mzmine.util.SortingProperty;
-import org.apache.commons.math3.special.Erf;
-
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.*;
-import java.util.regex.Pattern;
 
 public class SiriusExportTask extends AbstractTask {
 
@@ -237,6 +246,21 @@ public class SiriusExportTask extends AbstractTask {
       setStatus(TaskStatus.FINISHED);
   }
 
+
+  public void runSingleRows(PeakListRow[] rows) {
+    setStatus(TaskStatus.PROCESSING);
+    try (final BufferedWriter bw = new BufferedWriter(new FileWriter(fileName, true))) {
+      for (PeakListRow row : rows)
+        exportPeakListRow(row, bw, getFragmentScans(row.getRawDataFiles()));
+    } catch (IOException e) {
+      setStatus(TaskStatus.ERROR);
+      setErrorMessage("Could not open file " + fileName + " for writing.");
+    }
+    if (getStatus() == TaskStatus.PROCESSING)
+      setStatus(TaskStatus.FINISHED);
+  }
+
+
   private void exportPeakList(PeakList peakList, BufferedWriter writer) throws IOException {
 
     final HashMap<String, int[]> fragmentScans = getFragmentScans(peakList.getRawDataFiles());
@@ -316,17 +340,23 @@ public class SiriusExportTask extends AbstractTask {
              * precursorScan.getMassList(massListName).getDataPoints() :
              * precursorScan.getDataPoints()); } } }
              */ // Do not include MS1 scans (except for isotope pattern)
+            MassList massList = scan.getMassList(massListName);
+            if (massList == null) {
+              setStatus(TaskStatus.ERROR);
+              String msg = "Scan " + f.getDataFile().getName() + "#" + scan.getScanNumber()
+                  + " does not have a mass list named " + massListName;
+              setErrorMessage(msg);
+              return;
+            }
             if (mergeMsMs == SiriusExportParameters.MERGE_MODE.NO_MERGE) {
               writeHeader(writer, row, f.getDataFile(), polarity, MsType.MSMS,
                   scan.getScanNumber());
               writeSpectrum(writer,
-                  massListName != null ? scan.getMassList(massListName).getDataPoints()
-                      : scan.getDataPoints());
+                  massListName != null ? massList.getDataPoints() : scan.getDataPoints());
             } else {
               if (mergeMsMs == SiriusExportParameters.MERGE_MODE.MERGE_OVER_SAMPLES)
                 sources.add(f.getDataFile().getName());
-              toMerge.add(massListName != null ? scan.getMassList(massListName).getDataPoints()
-                  : scan.getDataPoints());
+              toMerge.add(massListName != null ? massList.getDataPoints() : scan.getDataPoints());
             }
           }
         }
@@ -373,8 +403,9 @@ public class SiriusExportTask extends AbstractTask {
     writer.write(String.valueOf(row.getBestPeak().getMZ()));
     writer.newLine();
     writer.write("CHARGE=");
+    if (polarity == '-')
+      writer.write("-");
     writer.write(String.valueOf(Math.abs(row.getRowCharge())));
-    writer.write(polarity);
     writer.newLine();
     writer.write("RTINSECONDS=");
     writer.write(String.valueOf(feature.getRT() * 60d));

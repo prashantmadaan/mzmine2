@@ -22,21 +22,21 @@ import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.logging.Logger;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
-import javax.swing.JTextArea;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.ValueMarker;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
@@ -46,25 +46,24 @@ import net.sf.mzmine.chartbasics.chartthemes.EIsotopePatternChartTheme;
 import net.sf.mzmine.chartbasics.gui.swing.EChartPanel;
 import net.sf.mzmine.datamodel.DataPoint;
 import net.sf.mzmine.datamodel.PolarityType;
+import net.sf.mzmine.datamodel.impl.ExtendedIsotopePattern;
 import net.sf.mzmine.main.MZmineCore;
-import net.sf.mzmine.modules.peaklistmethods.isotopes.isotopepeakscanner.ExtendedIsotopePattern;
-import net.sf.mzmine.modules.peaklistmethods.isotopes.isotopepeakscanner.IsotopePeakScannerParameters;
-import net.sf.mzmine.modules.tools.isotopepatternpreview.customparameters.IsotopePatternPreviewCustomParameters;
-import net.sf.mzmine.modules.visualization.spectra.datasets.ExtendedIsotopePatternDataSet;
-import net.sf.mzmine.modules.visualization.spectra.renderers.SpectraToolTipGenerator;
+import net.sf.mzmine.modules.peaklistmethods.isotopes.isotopeprediction.IsotopePatternCalculator;
+import net.sf.mzmine.modules.visualization.spectra.simplespectra.datasets.ExtendedIsotopePatternDataSet;
+import net.sf.mzmine.modules.visualization.spectra.simplespectra.renderers.SpectraToolTipGenerator;
 import net.sf.mzmine.parameters.ParameterSet;
 import net.sf.mzmine.parameters.dialogs.ParameterSetupDialog;
-import net.sf.mzmine.parameters.dialogs.ParameterSetupDialogWithEmptyPreview;
-import net.sf.mzmine.parameters.parametertypes.BooleanParameter;
 import net.sf.mzmine.parameters.parametertypes.DoubleComponent;
 import net.sf.mzmine.parameters.parametertypes.DoubleParameter;
+import net.sf.mzmine.parameters.parametertypes.IntegerComponent;
 import net.sf.mzmine.parameters.parametertypes.IntegerParameter;
-import net.sf.mzmine.parameters.parametertypes.OptionalModuleParameter;
 import net.sf.mzmine.parameters.parametertypes.PercentComponent;
 import net.sf.mzmine.parameters.parametertypes.PercentParameter;
 import net.sf.mzmine.parameters.parametertypes.StringComponent;
 import net.sf.mzmine.parameters.parametertypes.StringParameter;
+import net.sf.mzmine.taskcontrol.TaskStatus;
 import net.sf.mzmine.util.ExitCode;
+import net.sf.mzmine.util.FormulaUtils;
 
 /**
  * 
@@ -72,36 +71,53 @@ import net.sf.mzmine.util.ExitCode;
  *
  */
 public class IsotopePatternPreviewDialog extends ParameterSetupDialog {
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+
   private Logger logger = Logger.getLogger(this.getClass().getName());
   private NumberFormat mzFormat = MZmineCore.getConfiguration().getMZFormat();
-  private NumberFormat relFormat = new DecimalFormat("0.0000");
+  private NumberFormat intFormat = new DecimalFormat("0.00 %");
+  private NumberFormat relFormat = new DecimalFormat("0.00000");
 
-  private double minAbundance, minIntensity, mergeWidth;
+  private double minIntensity, mergeWidth;
   private int charge;
   private PolarityType pol;
-  private String molecule;
+  private String formula;
 
   private EChartPanel pnlChart;
   private JFreeChart chart;
   private XYPlot plot;
   private EIsotopePatternChartTheme theme;
   private JPanel newMainPanel;
+  private JPanel pnlParameters;
   private JScrollPane pnText;
-  private JTextArea textArea;
   private JTable table;
-  private JButton btnCalc;
   private JSplitPane pnSplit;
+  private JPanel pnlControl;
 
-
-  private DoubleParameter pMinIntensity, pMergeWidth;
-  private PercentParameter pMinAbundance;
-  private StringParameter pMolecule;
-  private OptionalModuleParameter pCustom;
+  private DoubleParameter pMergeWidth;
+  private PercentParameter pMinIntensity;
+  private StringParameter pFormula;
   private IntegerParameter pCharge;
+
+  private DoubleComponent cmpMergeWidth;
+  private PercentComponent cmpMinIntensity;
+  private StringComponent cmpFormula;
+  private IntegerComponent cmpCharge;
+
+  private JLabel lblMergeWidth, lblMinIntensity, lblFormula, lblCharge, lblStatus;
 
   private ExtendedIsotopePatternDataSet dataset;
   private SpectraToolTipGenerator ttGen;
+  
+  IsotopePatternPreviewTask task;
+  Thread thread;
+  private boolean newParameters;
 
+  private long lastCalc;
+  
   String[][] columns = {{"Exact mass / Da", "Intensity", "Isotope composition"},
       {"m/z", "Intensity", "Isotope composition"}};
 
@@ -113,27 +129,39 @@ public class IsotopePatternPreviewDialog extends ParameterSetupDialog {
       ParameterSet parameters) {
     super(parent, valueCheckRequired, parameters);
 
-    pMolecule = parameterSet.getParameter(IsotopePatternPreviewParameters.molecule);
-    pCustom = parameterSet.getParameter(IsotopePatternPreviewParameters.optionals);
-
-    customParameters = pCustom.getEmbeddedParameters();
-    pMinIntensity =
-        customParameters.getParameter(IsotopePatternPreviewCustomParameters.minPatternIntensity);
-    pMinAbundance =
-        customParameters.getParameter(IsotopePatternPreviewCustomParameters.minAbundance);
-    pMergeWidth = customParameters.getParameter(IsotopePatternPreviewCustomParameters.mergeWidth);
-    pCharge = customParameters.getParameter(IsotopePatternPreviewCustomParameters.charge);
-
     aboveMin = new Color(30, 180, 30);
     belowMin = new Color(200, 30, 30);
+    
+    lastCalc = 0;
 
+    mzFormat = MZmineCore.getConfiguration().getMZFormat();
+
+    newParameters = false;
+//    task = new IsotopePatternPreviewTask(formula, minIntensity, mergeWidth, charge, pol, this);
+//    thread = new Thread(task);
+    
+    formatChart();
+    parametersChanged();
   }
 
   @Override
   protected void addDialogComponents() {
     super.addDialogComponents();
 
+    pFormula = parameterSet.getParameter(IsotopePatternPreviewParameters.formula);
+    pMinIntensity = parameterSet.getParameter(IsotopePatternPreviewParameters.minIntensity);
+    pMergeWidth = parameterSet.getParameter(IsotopePatternPreviewParameters.mergeWidth);
+    pCharge = parameterSet.getParameter(IsotopePatternPreviewParameters.charge);
+
     Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+
+    cmpMinIntensity =
+        (PercentComponent) getComponentForParameter(IsotopePatternPreviewParameters.minIntensity);
+    cmpMergeWidth =
+        (DoubleComponent) getComponentForParameter(IsotopePatternPreviewParameters.mergeWidth);
+    cmpCharge = (IntegerComponent) getComponentForParameter(IsotopePatternPreviewParameters.charge);
+    cmpFormula =
+        (StringComponent) getComponentForParameter(IsotopePatternPreviewParameters.formula);
 
     // panels
     newMainPanel = new JPanel(new BorderLayout());
@@ -141,6 +169,8 @@ public class IsotopePatternPreviewDialog extends ParameterSetupDialog {
     pnlChart = new EChartPanel(chart);
     pnSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, pnlChart, pnText);
     table = new JTable();
+    pnlParameters = new JPanel(new FlowLayout());
+    pnlControl = new JPanel(new BorderLayout());
 
     pnText.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
     pnText.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
@@ -148,30 +178,27 @@ public class IsotopePatternPreviewDialog extends ParameterSetupDialog {
     pnText.setMinimumSize(new Dimension(350, 300));
     pnlChart.setMinimumSize(new Dimension(350, 200));
     pnlChart.setPreferredSize( // TODO: can you do this cleaner?
-        new Dimension((int) (screenSize.getWidth() / 2), (int) (screenSize.getHeight() / 3)));
+        new Dimension((int) (screenSize.getWidth() / 3), (int) (screenSize.getHeight() / 3)));
     table.setMinimumSize(new Dimension(350, 300));
     table.setDefaultEditor(Object.class, null);
 
     // controls
-    textArea = new JTextArea();
-    btnCalc = new JButton("Calculate");
     ttGen = new SpectraToolTipGenerator();
     theme = new EIsotopePatternChartTheme();
     theme.initialize();
-    btnCalc.addActionListener(this);
-    textArea.setEditable(false);
 
     // reorganize
     getContentPane().remove(mainPanel);
-    newMainPanel.add(mainPanel, BorderLayout.SOUTH);
+    organizeParameterPanel();
+    pnlControl.add(pnlParameters, BorderLayout.CENTER);
+    pnlControl.add(pnlButtons, BorderLayout.SOUTH);
     newMainPanel.add(pnSplit, BorderLayout.CENTER);
-    mainPanel.add(btnCalc, 0, getNumberOfParameters() + 1);
+    newMainPanel.add(pnlControl, BorderLayout.SOUTH);
     getContentPane().add(newMainPanel);
     pnlButtons.remove(super.btnCancel);
 
     chart = ChartFactory.createXYBarChart("Isotope pattern preview", "m/z", false, "Abundance",
         new XYSeriesCollection(new XYSeries("")));
-    theme.apply(chart);
     pnlChart.setChart(chart);
     pnText.setViewportView(table);
 
@@ -179,46 +206,114 @@ public class IsotopePatternPreviewDialog extends ParameterSetupDialog {
     pack();
   }
 
+  private void organizeParameterPanel() {
+    lblMergeWidth = new JLabel(pMergeWidth.getName());
+    lblMinIntensity = new JLabel(pMinIntensity.getName());
+    lblFormula = new JLabel(pFormula.getName());
+    lblCharge = new JLabel(pCharge.getName());
+    lblStatus = new JLabel("Status");
+    setStatus("Waiting.");
+
+    mainPanel.remove(cmpCharge);
+    mainPanel.remove(cmpMergeWidth);
+    mainPanel.remove(cmpMinIntensity);
+    mainPanel.remove(cmpFormula);
+
+    lblFormula.setLabelFor(cmpFormula);
+    lblMinIntensity.setLabelFor(cmpMinIntensity);
+    lblMergeWidth.setLabelFor(cmpMergeWidth);
+    lblCharge.setLabelFor(cmpCharge);
+    
+//    cmpCharge.setPreferredSize(new Dimension(30, cmpCharge.getHeight()));
+    cmpCharge.setColumns(2);
+    
+    
+
+    pnlParameters.add(lblFormula);
+    pnlParameters.add(cmpFormula);
+    pnlParameters.add(lblMinIntensity);
+    pnlParameters.add(cmpMinIntensity);
+    pnlParameters.add(lblMergeWidth);
+    pnlParameters.add(cmpMergeWidth);
+    pnlParameters.add(lblCharge);
+    pnlParameters.add(cmpCharge);
+    pnlParameters.add(lblStatus);
+  }
+
   public void actionPerformed(ActionEvent ae) {
     if (ae.getSource() == btnOK) {
       this.closeDialog(ExitCode.CANCEL);
     }
-
-    if (ae.getSource() == btnCalc) {
-      updateParameterSetFromComponents();
-      updatePreview();
-    }
+    updateWindow();
   }
 
   @Override
   protected void parametersChanged() {
-    updatePreview();
+    updateWindow();
   }
 
   // -----------------------------------------------------
   // methods
   // -----------------------------------------------------
-  private void updatePreview() {
+  public void updateWindow() {
     if (!updateParameters()) {
-      logger.warning(
-          "updatePreview() failed. Could not update parameters or parameters are invalid."
-          + "\nPlease check the parameters.");
+      logger
+          .warning("updateWindow() failed. Could not update parameters or parameters are invalid."
+              + "\nPlease check the parameters.");
       return;
     }
-
-    ExtendedIsotopePattern pattern = calculateIsotopePattern();
-    if (pattern == null) {
-      logger.warning("Could not calculate isotope pattern. Please check the parameters.");
-      return;
+    
+    if(FormulaUtils.getFormulaSize(formula) > 5E3 && ((System.nanoTime() - lastCalc) * 1E-6 < 150)) {
+      logger.finest("Big formula " + formula + " size: " + FormulaUtils.getFormulaSize(formula) + " or last calculation recent: " + (System.nanoTime() -  lastCalc) / 1E6 + " ms");
     }
 
+    if(task != null && thread != null && task.getStatus() == TaskStatus.PROCESSING && FormulaUtils.getFormulaSize(formula) > 1E4) {
+      newParameters = true;
+      task.setDisplayResult(false);
+    }
+    else {
+      if(task != null)
+        task.setDisplayResult(false);
+      logger.finest("Creating new Thread: " + formula);
+      task = new IsotopePatternPreviewTask(formula, minIntensity, mergeWidth, charge, pol, this);
+      thread = new Thread(task);
+      thread.setPriority(10);
+      thread.start();
+    }
+
+    lastCalc = System.nanoTime();
+  }
+
+  /**
+   * this is being called by the calculation task to update the pattern
+   * @param pattern
+   */
+  protected void updateChart(ExtendedIsotopePattern pattern) {
+    dataset = new ExtendedIsotopePatternDataSet(pattern, minIntensity, mergeWidth);
+    if (pol == PolarityType.NEUTRAL)
+      chart = ChartFactory.createXYBarChart("Isotope pattern preview", "Exact mass / Da", false,
+          "Abundance", dataset);
+    else
+      chart = ChartFactory.createXYBarChart("Isotope pattern preview", "m/z", false, "Abundance",
+          dataset);
+
+    formatChart();
+
+    pnlChart.setChart(chart);
+  }
+  
+  /**
+   * this is being called by the calculation task to update the table
+   * @param pattern
+   */
+  protected void updateTable(ExtendedIsotopePattern pattern) {
     DataPoint[] dp = pattern.getDataPoints();
     Object[][] data = new Object[dp.length][];
     for (int i = 0; i < pattern.getNumberOfDataPoints(); i++) {
       data[i] = new Object[3];
       data[i][0] = mzFormat.format(dp[i].getMZ());
       data[i][1] = relFormat.format(dp[i].getIntensity());
-      data[i][2] = pattern.getDetailedPeakDescription(i);
+      data[i][2] = pattern.getIsotopeComposition(i);
     }
 
     if (pol == PolarityType.NEUTRAL)
@@ -228,47 +323,32 @@ public class IsotopePatternPreviewDialog extends ParameterSetupDialog {
 
     pnText.setViewportView(table);
     table.setDefaultEditor(Object.class, null); // make editing impossible
-    updateChart(pattern);
   }
-
-  private void updateChart(ExtendedIsotopePattern pattern) {
-    dataset = new ExtendedIsotopePatternDataSet(pattern, minIntensity, mergeWidth);
-    if (pol == PolarityType.NEUTRAL)
-      chart = ChartFactory.createXYBarChart("Isotope pattern preview", "Exact mass / Da", false,
-          "Abundance", dataset);
-    else
-      chart = ChartFactory.createXYBarChart("Isotope pattern preview", "m/z", false, "Abundance",
-          dataset);
-
+  
+  private void formatChart() {
     theme.apply(chart);
     plot = chart.getXYPlot();
-    plot.addRangeMarker(new ValueMarker(minIntensity, belowMin, new BasicStroke(1.0f)));
+//    plot.addRangeMarker(new ValueMarker(minIntensity, belowMin, new BasicStroke(1.0f)));
+    ((NumberAxis) plot.getDomainAxis()).setNumberFormatOverride(mzFormat);
+    ((NumberAxis) plot.getRangeAxis()).setNumberFormatOverride(intFormat);
+
     XYItemRenderer r = plot.getRenderer();
     r.setSeriesPaint(0, aboveMin);
     r.setSeriesPaint(1, belowMin);
     r.setDefaultToolTipGenerator(ttGen);
-    pnlChart.setChart(chart);
   }
 
   private boolean updateParameters() {
     updateParameterSetFromComponents();
     if (!checkParameters()) {
-      logger.info("updateParameters() failed due to invalid input.");
+      logger.fine("updateParameters() failed due to invalid input.");
       return false;
     }
 
-    molecule = pMolecule.getValue();
-    if (pCustom.getValue()) {
-      minAbundance = pMinAbundance.getValue();
-      mergeWidth = pMergeWidth.getValue();
-      minIntensity = pMinIntensity.getValue();
-      charge = pCharge.getValue();
-    } else {
-      minAbundance = 0.01;
-      mergeWidth = 0.0005;
-      minIntensity = 0.05;
-      charge = 1;
-    }
+    formula = pFormula.getValue();
+    mergeWidth = pMergeWidth.getValue();
+    minIntensity = pMinIntensity.getValue();
+    charge = pCharge.getValue();
 
     if (charge > 0) {
       pol = PolarityType.POSITIVE;
@@ -283,50 +363,42 @@ public class IsotopePatternPreviewDialog extends ParameterSetupDialog {
   }
 
   private boolean checkParameters() {
-    if (/* pElement.getValue().equals("") */pMolecule.getValue() == null
-        || pMolecule.getValue().equals("")) {
-      logger.info("Invalid input or Element == \"\" and no autoCarbon");
-      return false;
-    }
-    if (pMinAbundance.getValue() == null || pMinAbundance.getValue() > 1.0d
-        || pMinAbundance.getValue() <= 0.0d) {
-      logger.info("Minimun abundance invalid. " + pMinAbundance.getValue());
+    if (pFormula.getValue() == null || pFormula.getValue().equals("")
+        || !FormulaUtils.checkMolecularFormula(pFormula.getValue())) {
+      logger.fine("Invalid input or Element == \"\" or invalid elements.");
       return false;
     }
     if (pMinIntensity.getValue() == null || pMinIntensity.getValue() > 1.0d
         || pMinIntensity.getValue() < 0.0d) {
-      logger.info("Minimum intensity invalid. " + pMinIntensity.getValue());
+      logger.fine("Minimum intensity invalid. " + pMinIntensity.getValue());
       return false;
     }
     if (pMergeWidth.getValue() == null || pMergeWidth.getValue() < 0.0d) {
-      logger.info("Merge width invalid. " + pMergeWidth.getValue());
+      logger.fine("Merge width invalid. " + pMergeWidth.getValue());
+      return false;
+    }
+    if (pCharge.getValue() == null) {
+      logger.fine("Charge invalid. " + pCharge.getValue());
       return false;
     }
 
-    logger.info("Parameters valid");
+    logger.finest("Parameters valid");
     return true;
   }
 
-  private ExtendedIsotopePattern calculateIsotopePattern() {
-    ExtendedIsotopePattern pattern = new ExtendedIsotopePattern();
-
-    if (!checkParameters())
-      return null;
-
-    if (molecule.equals(""))
-      return null;
-
-    logger.info("Calculating isotope pattern: " + molecule);
-
-    try {
-      pattern.setUpFromFormula(molecule, minAbundance, mergeWidth, minIntensity);
-    } catch (Exception e) {
-      logger.warning("The entered Sum formula is invalid. Canceling.");
-      return null;
+  public void startNextThread() {
+    if(newParameters) {
+      lblStatus.setText("Calculating...");
+      newParameters = false;
+      logger.finest("Creating new Thread: " + formula);
+      task = new IsotopePatternPreviewTask(formula, minIntensity, mergeWidth, charge, pol, this);
+      thread = new Thread(task);
+      thread.setPriority(10);
+      thread.start();
     }
-    if (pol != PolarityType.NEUTRAL)
-      pattern.applyCharge(charge, pol);
-
-    return pattern;
+  }
+  
+  public void setStatus(String status) {
+    lblStatus.setText(status);
   }
 }

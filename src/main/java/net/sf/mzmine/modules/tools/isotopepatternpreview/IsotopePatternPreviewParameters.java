@@ -19,11 +19,13 @@
 package net.sf.mzmine.modules.tools.isotopepatternpreview;
 
 import java.awt.Window;
-import net.sf.mzmine.modules.tools.isotopepatternpreview.customparameters.IsotopePatternPreviewCustomParameters;
+import net.sf.mzmine.main.MZmineCore;
 import net.sf.mzmine.parameters.Parameter;
 import net.sf.mzmine.parameters.dialogs.ParameterSetupDialog;
 import net.sf.mzmine.parameters.impl.SimpleParameterSet;
-import net.sf.mzmine.parameters.parametertypes.OptionalModuleParameter;
+import net.sf.mzmine.parameters.parametertypes.DoubleParameter;
+import net.sf.mzmine.parameters.parametertypes.IntegerParameter;
+import net.sf.mzmine.parameters.parametertypes.PercentParameter;
 import net.sf.mzmine.parameters.parametertypes.StringParameter;
 import net.sf.mzmine.util.ExitCode;
 
@@ -34,18 +36,24 @@ import net.sf.mzmine.util.ExitCode;
  */
 public class IsotopePatternPreviewParameters extends SimpleParameterSet {
 
-  public static final StringParameter molecule = new StringParameter("Element/Molecule",
-      "The element/molecule to calculate the isotope pattern of. Enter a sum formula.");
+  public static final StringParameter formula = new StringParameter("Chemical formula",
+      "The element/formula to calculate the isotope pattern of. Enter a sum formula.");
 
-  public static final OptionalModuleParameter optionals =
-      new OptionalModuleParameter("Use custom parameters",
-          "If not checked, default parameters will be used to calculate the isotope pattern.\n"
-          + "The standard values are:\n"
-          + "  minimum Abundance = 1.0 %\n"
-          + "  minimum Intensity = 0.05 / 1\n"
-          + "  merge width = 0.0005 Da",
-          new IsotopePatternPreviewCustomParameters());
+  public static final DoubleParameter mergeWidth = new DoubleParameter("Merge width (m/z)",
+      "This will be used to merge isotope compositions in the calculated isotope pattern if they overlap.",
+      MZmineCore.getConfiguration().getMZFormat(), 0.00005, 0.0d, 10.0d);
 
+  public static final PercentParameter minIntensity = new PercentParameter("Minimum intensity",
+      "The minimum natural abundance of an isotope and normalized intensity in the calculated isotope pattern.\n"
+          + "Min = 0.0, Max = 0.99...",
+      0.001, 0.0, 0.9999999999);
+
+  public static final IntegerParameter charge = new IntegerParameter("Charge",
+      "Enter a charge to apply to the molecule. (e.g. [M]+ = +1 / [M]- = -1\n"
+          + "This can also be set to 0 to plot the exact mass.",
+      1, true);
+
+  @Override
   public ExitCode showSetupDialog(Window parent, boolean valueCheckRequired) {
     if ((getParameters() == null) || (getParameters().length == 0))
       return ExitCode.OK;
@@ -56,6 +64,6 @@ public class IsotopePatternPreviewParameters extends SimpleParameterSet {
   }
 
   public IsotopePatternPreviewParameters() {
-    super(new Parameter[] {molecule, optionals});
+    super(new Parameter[] {formula, minIntensity, mergeWidth, charge});
   }
 }

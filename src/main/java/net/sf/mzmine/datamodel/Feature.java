@@ -20,7 +20,6 @@ package net.sf.mzmine.datamodel;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
 import com.google.common.collect.Range;
 import net.sf.mzmine.datamodel.impl.SimplePeakInformation;
 
@@ -121,6 +120,11 @@ public interface Feature {
   public int getMostIntenseFragmentScanNumber();
 
   /**
+   * Returns all scan numbers that represent fragmentations of this peak in MS2 level.
+   */
+  public int[] getAllMS2FragmentScanNumbers();
+
+  /**
    * Returns the isotope pattern of this peak or null if no pattern is attached
    */
   public @Nullable IsotopePattern getIsotopePattern();
@@ -178,4 +182,8 @@ public interface Feature {
   public SimplePeakInformation getPeakInformation();
   // End dulab Edit
 
+  @Nullable
+  default public Integer getParentChromatogramRowID() {
+    return null;
+  }
 }
